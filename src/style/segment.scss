@@ -1,0 +1,25 @@
+@import 'src/style/variables';
+
+.segment {
+    position: relative;
+
+    border-radius: $segments-border-radius;
+
+    background-color: #323741;
+
+    &:before {
+        position: absolute;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        right: 0;
+        content: '';
+        z-index: -1;
+
+        margin: -0.85px;
+
+        border-radius: inherit;
+
+        background: linear-gradient(to right, #4b525c, #323741);
+    }
+}

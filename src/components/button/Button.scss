@@ -1,0 +1,28 @@
+@import 'src/style/variables';
+
+.component-button {
+    height: 60px;
+    min-width: 100px;
+    padding: 0 20px;
+
+    color: white;
+    font-weight: bold;
+    font-size: 14px;
+
+    border: none;
+    border-radius: $inputs-border-radius;
+
+    background-color: $blue;
+
+    cursor: pointer;
+
+    transition: background-color 0.2s ease;
+
+    &:hover {
+        background-color: darken($color: $blue, $amount: 7);
+    }
+
+    &:active {
+        background-color: darken($color: $blue, $amount: 14);
+    }
+}
