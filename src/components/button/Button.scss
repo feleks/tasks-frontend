@@ -25,4 +25,8 @@
     &:active {
         background-color: darken($color: $blue, $amount: 14);
     }
+
+    &.loading {
+        font-size: 17px;
+    }
 }

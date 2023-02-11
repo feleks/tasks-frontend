@@ -30,7 +30,8 @@
     "require-jsdoc": "off",
     "camelcase": "off",
     "no-unused-vars": "error",
-    "no-undef": "off"
+    "no-undef": "off",
+    "@typescript-eslint/no-explicit-any": "off"
   },
   "env": {
     "mocha": true,
