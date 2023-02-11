@@ -129,11 +129,6 @@
         "stylelint-scss": "4.3.0",
         "stylelint-semantic-groups": "1.1.4"
     },
-    "husky": {
-        "hooks": {
-            "pre-commit": "lint-staged"
-        }
-    },
     "lint-staged": {
         "src/**/*.{tsx,ts}": [
             "eslint . --fix"
