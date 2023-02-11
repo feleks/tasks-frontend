@@ -11,32 +11,34 @@ export interface Notification {
     id: NotificationID;
     type: NotificationType;
     message: NotificationMessage;
-    expireAt: number;
+    duration: number;
 }
 
 interface NotificationStore {
     lastID: NotificationID;
     notifications: Notification[];
 
-    push(type: NotificationType, message: NotificationMessage, expire?: number): void;
+    push(type: NotificationType, message: NotificationMessage, duration?: number): void;
     delete(id: NotificationID): void;
 }
 
-const defaultNotificationExpire = 5000;
+const defaultNotificationDuration = 5000;
 
 export const useNotificationStore = create<NotificationStore>()((set) => ({
     lastID: 0,
     notifications: [],
-    push(type, message, expire = defaultNotificationExpire) {
+    push(type, message, duration = defaultNotificationDuration) {
         set((state) => {
             const id = state.lastID + 1;
             const notification: Notification = {
                 id,
                 type,
                 message,
-                expireAt: Date.now() + expire
+                duration
             };
             const newNotifications = [...state.notifications, notification];
+
+            console.log('pushing notification:', newNotifications);
 
             return {
                 lastID: id,
@@ -56,3 +58,37 @@ export const useNotificationStore = create<NotificationStore>()((set) => ({
         });
     }
 }));
+
+useNotificationStore.getState().push(
+    'error',
+    `
+asd
+ads
+asd
+asdasd
+asd
+sda
+das
+das
+asd
+asd
+asd
+asd
+asd
+asd
+asd
+asd
+
+asdasd
+asdsd
+aasd
+asd
+
+asd
+sda
+asd
+`
+);
+useNotificationStore.getState().push('warning', 'warning');
+useNotificationStore.getState().push('success', 'success');
+useNotificationStore.getState().push('info', 'info');

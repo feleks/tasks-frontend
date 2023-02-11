@@ -1,0 +1,127 @@
+@import 'src/style/variables';
+
+.component-notification {
+    // margin-left: 100%;
+    // max-width: 0;
+    height: 0;
+
+    overflow: visible;
+
+    transition: height 1s ease;
+
+    &.error {
+        .component-notification-body-icon {
+            color: $red;
+        }
+
+        .component-notification-body-progress-line {
+            background-color: $red;
+        }
+    }
+
+    &.warning {
+        .component-notification-body-icon {
+            color: $yellow;
+        }
+
+        .component-notification-body-progress-line {
+            background-color: $yellow;
+        }
+    }
+
+    &.success {
+        .component-notification-body-icon {
+            color: $green;
+        }
+
+        .component-notification-body-progress-line {
+            background-color: $green;
+        }
+    }
+
+    &.info {
+        .component-notification-body-icon {
+            color: $blue;
+        }
+
+        .component-notification-body-progress-line {
+            background-color: $blue;
+        }
+    }
+}
+
+.component-notification-body {
+    position: relative;
+    left: 100%;
+
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+
+    padding: 20px 40px 30px 20px;
+
+    transition: left 1s ease;
+}
+
+.component-notification-body-icon {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+
+    width: 35px;
+    padding-right: 15px;
+
+    color: white;
+    font-size: 30px;
+}
+
+.component-notification-body-message {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    width: 300px;
+
+    color: white;
+}
+
+.component-notification-body-progress {
+    position: absolute;
+    left: 20px;
+    bottom: 10px;
+    right: 20px;
+
+    height: 6px;
+}
+
+.component-notification-body-progress-wrapper {
+    width: 100%;
+    height: 6px;
+
+    overflow: hidden;
+}
+
+.component-notification-body-progress-line {
+    width: 100%;
+    height: 6px;
+
+    border-radius: 5px;
+}
+
+.component-notification-body-close {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+
+    color: white;
+    font-size: 18px;
+
+    cursor: pointer;
+
+    transition: color 0.2s ease;
+
+    &:hover {
+        color: $red;
+    }
+}
