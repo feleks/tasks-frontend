@@ -56,37 +56,3 @@ export const useNotificationStore = create<NotificationStore>()((set) => ({
         });
     }
 }));
-
-useNotificationStore.getState().show(
-    'error',
-    `
-asd
-ads
-asd
-asdasd
-asd
-sda
-das
-das
-asd
-asd
-asd
-asd
-asd
-asd
-asd
-asd
-
-asdasd
-asdsd
-aasd
-asd
-
-asd
-sda
-asd
-`
-);
-useNotificationStore.getState().show('warning', 'warning');
-useNotificationStore.getState().show('success', 'success');
-useNotificationStore.getState().show('info', 'info');

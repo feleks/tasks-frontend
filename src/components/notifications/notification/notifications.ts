@@ -15,9 +15,13 @@ export function registerNotificationEvents(
     let expiresAt = Date.now() + duration;
 
     // Вытаскивание нотификации из-за краёв экрана
-    body.style.left = '-20px';
-    const bodyRects = body.getBoundingClientRect();
-    container.style.height = `${bodyRects.height + 10}px`;
+    requestAnimationFrame(() => {
+        body.style.left = '-20px';
+        const bodyRects = body.getBoundingClientRect();
+        container.style.height = `${bodyRects.height + 10}px`;
+        progressWrapper.style.transition = `width ${(duration / 1000).toFixed(1)}s linear`;
+        progressWrapper.style.width = '0';
+    });
 
     // Закрытие нотификации и уделаение из стора
     let removeFromStoreTimeout: Timeout | null = null;
@@ -37,8 +41,6 @@ export function registerNotificationEvents(
     // Дефолтное закрытие по истечении времени
     // const progressRect = progress.getBoundingClientRect();
     // progressLine.style.width = `${progressRect.width}px`;
-    progressWrapper.style.transition = `width ${(duration / 1000).toFixed(1)}s linear`;
-    progressWrapper.style.width = '0';
     let closeTimeout: Timeout | null = null;
     startCloseTimeout(duration);
 
