@@ -18,7 +18,7 @@ interface NotificationStore {
     lastID: NotificationID;
     notifications: Notification[];
 
-    push(type: NotificationType, message: NotificationMessage, duration?: number): void;
+    show(type: NotificationType, message: NotificationMessage, duration?: number): void;
     delete(id: NotificationID): void;
 }
 
@@ -27,7 +27,7 @@ const defaultNotificationDuration = 5000;
 export const useNotificationStore = create<NotificationStore>()((set) => ({
     lastID: 0,
     notifications: [],
-    push(type, message, duration = defaultNotificationDuration) {
+    show(type, message, duration = defaultNotificationDuration) {
         set((state) => {
             const id = state.lastID + 1;
             const notification: Notification = {
@@ -37,8 +37,6 @@ export const useNotificationStore = create<NotificationStore>()((set) => ({
                 duration
             };
             const newNotifications = [...state.notifications, notification];
-
-            console.log('pushing notification:', newNotifications);
 
             return {
                 lastID: id,
@@ -59,7 +57,7 @@ export const useNotificationStore = create<NotificationStore>()((set) => ({
     }
 }));
 
-useNotificationStore.getState().push(
+useNotificationStore.getState().show(
     'error',
     `
 asd
@@ -89,6 +87,6 @@ sda
 asd
 `
 );
-useNotificationStore.getState().push('warning', 'warning');
-useNotificationStore.getState().push('success', 'success');
-useNotificationStore.getState().push('info', 'info');
+useNotificationStore.getState().show('warning', 'warning');
+useNotificationStore.getState().show('success', 'success');
+useNotificationStore.getState().show('info', 'info');

@@ -1,6 +1,8 @@
 @import 'src/style/variables';
 
 .component-button {
+    position: relative;
+
     height: 60px;
     min-width: 100px;
     padding: 0 20px;
@@ -16,7 +18,7 @@
 
     cursor: pointer;
 
-    transition: background-color 0.2s ease;
+    transition: background-color 0.2s ease, color 0.2s ease;
 
     &:hover {
         background-color: darken($color: $blue, $amount: 7);
@@ -27,6 +29,28 @@
     }
 
     &.loading {
-        font-size: 17px;
+        color: transparent;
+
+        .component-button-spinner {
+            color: white;
+        }
     }
+}
+
+.component-button-spinner {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+
+    color: transparent;
+    font-size: 20px;
+
+    transition: color 0.2s ease;
 }

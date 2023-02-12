@@ -12,18 +12,26 @@ interface Props {
 }
 
 export function Button(props: Props) {
-    const { value, submit = false, loading = false, className } = props;
+    const { value, submit = false, loading, className } = props;
 
-    // return <input className={classNames('component-button', className)} type={submit ? 'submit' : 'button'} value={value} />;
+    let includeLoading = false;
+    if (loading != null) {
+        includeLoading = true;
+    }
 
-    let finalValue: any = value;
-    if (loading) {
-        finalValue = <FontAwesomeIcon className="spinner" icon={faSpinner} />;
+    let loadingFragment: JSX.Element | null = null;
+    if (includeLoading) {
+        loadingFragment = (
+            <div className="component-button-spinner">
+                <FontAwesomeIcon className="spinner" icon={faSpinner} />
+            </div>
+        );
     }
 
     return (
         <button type={submit ? 'submit' : 'button'} className={classNames('component-button', { loading }, className)}>
-            {finalValue}
+            {value}
+            {loadingFragment}
         </button>
     );
 }
