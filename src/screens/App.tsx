@@ -8,16 +8,15 @@ import { useAuthStore } from 'src/stores/auth';
 import './App.scss';
 import { Login } from './login/Login';
 import { Main } from './main/Main';
+import { Register } from './register/Register';
 
 export function App() {
     const status = useAuthStore((state) => state.status);
     const markAuthenticated = useAuthStore((state) => state.markAuthenticated);
 
     async function authenticate() {
-        console.log(11111);
         const user = await apiCall('/frontend/auth', null);
         markAuthenticated(user);
-        console.log(22222);
     }
 
     useEffect(() => {
@@ -38,6 +37,7 @@ export function App() {
         <div className="screen-app">
             <BrowserRouter>
                 <Routes>
+                    <Route path="/register" element={<Register />} />
                     <Route path="/login" element={<Login />} />
                     <Route path="/*" element={<Main />} />
                 </Routes>

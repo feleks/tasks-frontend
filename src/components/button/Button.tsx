@@ -9,10 +9,11 @@ interface Props {
     submit?: boolean;
     loading?: boolean;
     className?: string;
+    style?: 'blue' | 'grey';
 }
 
 export function Button(props: Props) {
-    const { value, submit = false, loading, className } = props;
+    const { value, submit = false, loading, style = 'blue', className } = props;
 
     let includeLoading = false;
     if (loading != null) {
@@ -29,7 +30,10 @@ export function Button(props: Props) {
     }
 
     return (
-        <button type={submit ? 'submit' : 'button'} className={classNames('component-button', { loading }, className)}>
+        <button
+            type={submit ? 'submit' : 'button'}
+            className={classNames('component-button', `style-${style}`, { loading }, className)}
+        >
             {value}
             {loadingFragment}
         </button>

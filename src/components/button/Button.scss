@@ -14,25 +14,43 @@
     border: none;
     border-radius: $inner-border-radius;
 
-    background-color: $blue;
-
     cursor: pointer;
 
-    transition: background-color 0.2s ease, color 0.2s ease;
-
-    &:hover {
-        background-color: darken($color: $blue, $amount: 7);
-    }
-
-    &:active {
-        background-color: darken($color: $blue, $amount: 14);
-    }
+    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
 
     &.loading {
         color: transparent;
 
         .component-button-spinner {
             color: white;
+        }
+    }
+
+    &.style-blue {
+        background-color: $blue;
+
+        &:hover {
+            background-color: darken($color: $blue, $amount: 7);
+        }
+
+        &:active {
+            background-color: darken($color: $blue, $amount: 14);
+        }
+    }
+
+    &.style-grey {
+        border: 1px solid #6b707a;
+
+        background-color: transparent;
+
+        &:hover {
+            background-color: #6b707a;
+        }
+
+        &:active {
+            border-color: darken($color: #6b707a, $amount: 14);
+
+            background-color: darken($color: #6b707a, $amount: 14);
         }
     }
 }

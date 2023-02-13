@@ -1,6 +1,6 @@
 import { faShield, faUser } from '@fortawesome/free-solid-svg-icons';
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { apiCall } from 'src/api/api_call';
 import { ApiError } from 'src/api/errors';
 import { Button } from 'src/components/button/Button';
@@ -75,6 +75,9 @@ export function Login() {
                 }}
             />
             <Button className="screen-login-login-button" value="Login" submit loading={loading} />
+            <Link to="/register">
+                <a className="screen-login-sign-up">Sign up</a>
+            </Link>
         </form>
     );
 }
