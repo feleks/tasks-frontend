@@ -75,8 +75,8 @@ export function Login() {
                 }}
             />
             <Button className="screen-login-login-button" value="Login" submit loading={loading} />
-            <Link to="/register">
-                <a className="screen-login-sign-up">Sign up</a>
+            <Link className="screen-login-sign-up" to="/sign_up">
+                Sign up
             </Link>
         </form>
     );

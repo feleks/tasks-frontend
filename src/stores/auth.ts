@@ -26,7 +26,7 @@ export const useAuthStore = create<AuthStore>()((set) => ({
     markNotAuthenticated(): void {
         let savedUrl = window.location.pathname;
 
-        if (savedUrl === '/login' || savedUrl === '/register') {
+        if (savedUrl === '/login' || savedUrl === '/sign_up') {
             savedUrl = '/';
         }
 

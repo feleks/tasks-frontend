@@ -5,15 +5,17 @@ import React from 'react';
 import './Button.scss';
 
 interface Props {
-    value: string;
+    value: string | JSX.Element;
+    small?: boolean;
     submit?: boolean;
     loading?: boolean;
     className?: string;
-    style?: 'blue' | 'grey';
+    style?: 'blue' | 'grey' | 'red';
+    onClick?: React.MouseEventHandler;
 }
 
 export function Button(props: Props) {
-    const { value, submit = false, loading, style = 'blue', className } = props;
+    const { value, submit = false, loading, style = 'blue', small = false, onClick, className } = props;
 
     let includeLoading = false;
     if (loading != null) {
@@ -32,7 +34,8 @@ export function Button(props: Props) {
     return (
         <button
             type={submit ? 'submit' : 'button'}
-            className={classNames('component-button', `style-${style}`, { loading }, className)}
+            className={classNames('component-button', `style-${style}`, { loading, small }, className)}
+            onClick={onClick}
         >
             {value}
             {loadingFragment}

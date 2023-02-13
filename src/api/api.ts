@@ -1,4 +1,4 @@
-import { AuthenticatedUser } from "./entities";
+import { AuthenticatedUser } from './entities';
 
 export interface Api {
     '/frontend/login': {
@@ -11,5 +11,18 @@ export interface Api {
     '/frontend/auth': {
         request: null;
         response: AuthenticatedUser;
+    };
+    '/frontend/sign_up': {
+        request: {
+            login: string;
+            password: string;
+            name: string;
+            email: string;
+        };
+        response: AuthenticatedUser;
+    };
+    '/frontend/logout': {
+        request: null;
+        response: null;
     };
 }

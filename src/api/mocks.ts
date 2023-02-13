@@ -18,5 +18,15 @@ export const mocks: Mocks = {
     },
     '/frontend/auth': () => {
         throw new ApiError('NotAuthenticated', null);
+    },
+    '/frontend/sign_up': (req) => {
+        return {
+            login: req.login,
+            email: req.email,
+            name: req.name
+        };
+    },
+    '/frontend/logout': () => {
+        return null;
     }
 };

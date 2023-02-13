@@ -8,7 +8,7 @@ import { useAuthStore } from 'src/stores/auth';
 import './App.scss';
 import { Login } from './login/Login';
 import { Main } from './main/Main';
-import { Register } from './register/Register';
+import { SignUp } from './sign_up/SignUp';
 
 export function App() {
     const status = useAuthStore((state) => state.status);
@@ -37,7 +37,7 @@ export function App() {
         <div className="screen-app">
             <BrowserRouter>
                 <Routes>
-                    <Route path="/register" element={<Register />} />
+                    <Route path="/sign_up" element={<SignUp />} />
                     <Route path="/login" element={<Login />} />
                     <Route path="/*" element={<Main />} />
                 </Routes>

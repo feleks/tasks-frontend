@@ -18,6 +18,14 @@
 
     transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
 
+    &.small {
+        height: 35px;
+        min-width: unset;
+        padding: 0 15px;
+
+        border-radius: 15px;
+    }
+
     &.loading {
         color: transparent;
 
@@ -35,6 +43,18 @@
 
         &:active {
             background-color: darken($color: $blue, $amount: 14);
+        }
+    }
+
+    &.style-red {
+        background-color: $red;
+
+        &:hover {
+            background-color: darken($color: $red, $amount: 7);
+        }
+
+        &:active {
+            background-color: darken($color: $red, $amount: 14);
         }
     }
 
