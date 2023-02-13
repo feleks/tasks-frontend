@@ -1,5 +1,6 @@
+@import 'src/style/variables';
+
 .screen-app {
-    
 }
 
 .screen-app-spinner {
@@ -19,4 +20,28 @@
 
     color: white;
     font-size: 50px;
+}
+
+.screen-app-error {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    height: 100vh;
+    min-width: 100vw;
+}
+
+.screen-app-error-title {
+    color: white;
+    font-weight: bold;
+    font-size: 25px;
+}
+
+.screen-app-error-details {
+    color: $red;
+}
+
+.screen-app-error-button {
+    margin-top: 20px;
 }

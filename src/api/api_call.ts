@@ -1,7 +1,7 @@
 import { Api } from './api';
 import { ApiError } from './errors';
 import { errorMiddlewares } from './middlewares';
-import { mocks, MOCKS_TIMEOUT } from './mocks';
+import { mocks, mocksEnabled, MOCKS_TIMEOUT } from './mocks';
 
 type MocksOptions = {
     useMocks?: boolean;
@@ -14,7 +14,12 @@ export async function apiCall<U extends keyof Api, REQ extends Api[U]['request']
     req: REQ,
     options: MocksOptions = {}
 ): Promise<RES> {
-    const { useMocks = process.env.NODE_ENV === 'development', mockTimeout = MOCKS_TIMEOUT, mockError } = options;
+    let { useMocks } = options;
+    const { mockTimeout = MOCKS_TIMEOUT, mockError } = options;
+
+    if (useMocks == null) {
+        useMocks = mocksEnabled();
+    }
 
     console.log(`making request to ${url}`);
 
@@ -46,10 +51,10 @@ export async function apiCall<U extends keyof Api, REQ extends Api[U]['request']
             body: req != null ? JSON.stringify(req) : undefined
         });
 
-        return parseRequestResults(rawResponse);
+        return await parseRequestResults(rawResponse);
     } catch (e) {
         for (const middleware of errorMiddlewares) {
-            middleware(e);
+            middleware(url, e);
         }
 
         throw e;

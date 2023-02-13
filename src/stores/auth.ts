@@ -3,11 +3,13 @@ import { create } from 'zustand';
 
 interface AuthStore {
     savedUrl: string;
-    status: 'in_progress' | 'complete';
+    status: 'in_progress' | 'complete' | 'error';
     user: AuthenticatedUser | null;
+    globalError?: string;
 
     markAuthenticated(user: AuthenticatedUser): void;
     markNotAuthenticated(): void;
+    markError(error: string): void;
 }
 
 export const useAuthStore = create<AuthStore>()((set) => ({
@@ -35,6 +37,14 @@ export const useAuthStore = create<AuthStore>()((set) => ({
                 savedUrl,
                 status: 'complete',
                 user: null
+            };
+        });
+    },
+    markError(error: string): void {
+        set(() => {
+            return {
+                status: 'error',
+                globalError: error
             };
         });
     }

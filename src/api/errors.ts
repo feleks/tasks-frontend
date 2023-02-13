@@ -21,6 +21,10 @@ export class ApiError<T extends keyof Errors> {
         this.debugMessage = debugMessage;
     }
 
+    static isApiError(e: any): boolean {
+        return e instanceof ApiError;
+    }
+
     static is<U extends keyof Errors>(e: any, name: U): boolean {
         const apiErr = ApiError.extract(e, name);
 

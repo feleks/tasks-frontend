@@ -1,6 +1,7 @@
 import { Api } from './api';
 import { ApiError } from './errors';
 
+export const MOCKS_MODE: 'default' | 'force_mocks' | 'force_fetch' = 'default';
 export const MOCKS_TIMEOUT = 1000;
 
 type Mocks = {
@@ -30,3 +31,11 @@ export const mocks: Mocks = {
         return null;
     }
 };
+
+export function mocksEnabled(): boolean {
+    if (MOCKS_MODE === 'default') {
+        return process.env.NODE_ENV === 'development';
+    }
+
+    return MOCKS_MODE === 'force_mocks';
+}
