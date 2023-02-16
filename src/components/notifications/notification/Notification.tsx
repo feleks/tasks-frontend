@@ -2,7 +2,7 @@ import { faCheck, faExclamation, faInfo, faXmark } from '@fortawesome/free-solid
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import classNames from 'classnames';
 import React, { useEffect, useRef } from 'react';
-import * as notificationStore from 'src/stores/notifications';
+import * as notificationStore from 'src/stores/notification';
 import './Notification.scss';
 import { registerNotificationEvents } from './notifications';
 

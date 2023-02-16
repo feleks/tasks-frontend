@@ -6,7 +6,7 @@ import { ApiError } from 'src/api/errors';
 import { Button } from 'src/components/button/Button';
 import { Input } from 'src/components/input/Input';
 import { useAuthStore } from 'src/stores/auth';
-import { useNotificationStore } from 'src/stores/notifications';
+import { useNotificationStore } from 'src/stores/notification';
 import './Login.scss';
 
 export function Login() {
@@ -39,7 +39,7 @@ export function Login() {
             markAuthenticated(user);
             navigate(savedUrl);
         } catch (e) {
-            if (ApiError.is(e, 'WrongUsernameOrPassword')) {
+            if (ApiError.is(e, 'WrongLoginOrPassword')) {
                 showNotification('error', `Wrong username or password`);
             }
         } finally {

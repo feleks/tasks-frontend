@@ -1,4 +1,4 @@
-import { AuthenticatedUser } from './entities';
+import { AuthenticatedUser, Project, ProjectID } from './entities';
 
 export interface Api {
     '/frontend/login': {
@@ -23,6 +23,32 @@ export interface Api {
     };
     '/frontend/logout': {
         request: null;
+        response: null;
+    };
+
+    '/frontend/get_projects': {
+        request: null;
+        response: {
+            projects: Project[];
+        };
+    };
+    '/frontend/create_project': {
+        request: {
+            title: string;
+        };
+        response: Project;
+    };
+    '/frontend/update_project': {
+        request: {
+            id: ProjectID;
+            title?: string;
+        };
+        response: null;
+    };
+    '/frontend/delete_project': {
+        request: {
+            id: ProjectID;
+        };
         response: null;
     };
 }

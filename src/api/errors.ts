@@ -1,6 +1,6 @@
 const errors = {
     NotAuthenticated: null,
-    WrongUsernameOrPassword: null
+    WrongLoginOrPassword: null
 };
 
 type Errors = typeof errors;

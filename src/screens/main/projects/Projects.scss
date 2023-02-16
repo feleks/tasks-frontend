@@ -1,0 +1,218 @@
+@import 'src/style/variables';
+
+.screen-projects {
+    margin: 0 20px;
+    padding-right: 6px;
+    padding-bottom: 20px;
+}
+
+.screen-projects-add {
+    padding: 20px 0 20px 20px;
+}
+
+.screen-projects-add-button {
+}
+
+// List
+.screen-projects-list {
+    max-height: calc(100vh - 220px);
+    padding: 0 14px 0 20px;
+
+    overflow-y: overlay;
+
+    &::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    &::-webkit-scrollbar-track {
+        background-color: transparent;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        border-radius: 4px;
+
+        background-color: fade-out($color: black, $amount: 0.8);
+    }
+}
+
+.screen-projects-list-item-wrapper {
+    position: relative;
+}
+
+.screen-projects-list-item-separator {
+    position: absolute;
+    left: 30px;
+    bottom: 0px;
+    right: 30px;
+
+    border-top: 1px solid #232832;
+}
+
+.screen-projects-list-item {
+    position: relative;
+
+    height: 50px;
+    margin-top: -1px;
+    padding: 0 0 0 25px;
+
+    color: white;
+    font-weight: bold;
+    line-height: 50px;
+
+    border-radius: 21px;
+
+    cursor: pointer;
+
+    user-select: none;
+
+    transition: background-color 0.2s ease;
+
+    &:hover {
+        background-color: #252a34;
+
+        .screen-projects-list-item-settings {
+            opacity: 1;
+        }
+    }
+
+    &.selected-item {
+        background-color: darken(#252a34, 2);
+
+        cursor: default;
+
+        .screen-projects-list-item-settings {
+            cursor: default;
+
+            opacity: 0.5;
+
+            pointer-events: none;
+        }
+    }
+}
+
+.screen-projects-list-loading-more {
+    position: absolute;
+    left: 10px;
+    bottom: 10px;
+    right: 10px;
+
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+
+    height: 60px;
+
+    color: $blue;
+    font-size: 17px;
+
+    border-radius: 25px;
+
+    background-color: #232832;
+
+    user-select: none;
+    pointer-events: none;
+
+    svg {
+        margin-right: 10px;
+
+        font-size: 21px;
+    }
+}
+
+.screen-projects-list-item-settings {
+    position: absolute;
+    top: 50%;
+    right: 10px;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    width: 30px;
+    height: 26px;
+    margin-top: -13px;
+
+    font-size: 14px;
+
+    border-radius: 12px;
+
+    background-color: $blue;
+
+    cursor: pointer;
+
+    opacity: 0;
+
+    transition: opacity 0.2s ease, background-color 0.2s ease;
+
+    &:hover {
+        background-color: darken($color: $blue, $amount: 7);
+    }
+
+    svg {
+        position: relative;
+        left: 0.7px;
+    }
+}
+
+// Empty
+.screen-projects-list-empty {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    height: 275px;
+}
+
+.screen-projects-list-empty-icon {
+    color: darken($color: white, $amount: 30);
+    font-size: 30px;
+}
+
+.screen-projects-list-empty-text {
+    margin-top: 20px;
+
+    color: white;
+}
+
+// Error
+.screen-projects-list-error {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    height: 275px;
+}
+
+.screen-projects-list-error-icon {
+    color: $red;
+    font-size: 30px;
+}
+
+.screen-projects-list-error-text {
+    margin-top: 20px;
+
+    color: white;
+}
+
+.screen-projects-list-error-reload {
+    margin-top: 20px;
+}
+
+// Loading
+.screen-projects-list-loading {
+}
+
+.screen-projects-list-loading-item {
+    position: relative;
+
+    height: 50px;
+    margin-bottom: 5px;
+
+    border-radius: 21px;
+
+    background-color: fade-out($color: #000000, $amount: 0.8);
+}

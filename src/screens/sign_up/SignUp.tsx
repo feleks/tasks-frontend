@@ -4,7 +4,7 @@ import { apiCall } from 'src/api/api_call';
 import { Button } from 'src/components/button/Button';
 import { Input } from 'src/components/input/Input';
 import { useAuthStore } from 'src/stores/auth';
-import { useNotificationStore } from 'src/stores/notifications';
+import { useNotificationStore } from 'src/stores/notification';
 import './SignUp.scss';
 
 export function SignUp() {

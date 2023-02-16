@@ -1,8 +1,8 @@
 import React from 'react';
-import { useNotificationStore } from 'src/stores/notifications';
+import { useNotificationStore } from 'src/stores/notification';
 import { Notification } from './notification/Notification';
-
 import './Notifications.scss';
+
 
 export function Notifications() {
     const notifications = useNotificationStore((state) => state.notifications);

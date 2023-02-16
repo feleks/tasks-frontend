@@ -1,5 +1,5 @@
 import { useAuthStore } from 'src/stores/auth';
-import { useNotificationStore } from 'src/stores/notifications';
+import { useNotificationStore } from 'src/stores/notification';
 import { ApiError } from './errors';
 
 type ErrorMiddleware = (url: string, err: any) => void;

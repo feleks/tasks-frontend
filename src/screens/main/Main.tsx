@@ -1,11 +1,13 @@
 import { faRightFromBracket, faUser } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Route, Routes, useNavigate } from 'react-router-dom';
 import { apiCall } from 'src/api/api_call';
 import { Button } from 'src/components/button/Button';
 import { useAuthStore } from 'src/stores/auth';
 import './Main.scss';
+import { ProjectSettings } from './project-settings/ProjectSettings';
+import { Projects } from './projects/Projects';
 
 export function Main() {
     const navigate = useNavigate();
@@ -58,7 +60,22 @@ export function Main() {
                         />
                     </div>
                 </div>
+                <Routes>
+                    <Route path="/projects" element={<Projects />} />
+                    <Route path="/projects/settings/:id" element={<Projects />} />
+                    <Route path="/" element={<Projects />} />
+                </Routes>
             </div>
+            <Routes>
+                <Route
+                    path="/projects/settings/:id"
+                    element={
+                        <div className="screen-main-right">
+                            <ProjectSettings />
+                        </div>
+                    }
+                />
+            </Routes>
         </div>
     );
 }

@@ -1,4 +1,4 @@
-import { Notification, useNotificationStore } from 'src/stores/notifications';
+import { Notification, useNotificationStore } from 'src/stores/notification';
 
 type Timeout = ReturnType<typeof setTimeout>;
 
