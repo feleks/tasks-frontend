@@ -3,7 +3,7 @@ import { apiCall } from 'src/api/api_call';
 import { Project, ProjectID } from 'src/api/entities';
 import { create } from 'zustand';
 import { useNotificationStore } from './notification';
-import { ScreenState } from './scree';
+import { ScreenState } from './screen';
 
 interface ProjectStore {
     projectStorage: Map<ProjectID, Project>;

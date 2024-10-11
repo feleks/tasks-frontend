@@ -25,6 +25,35 @@
     color: darken($color: white, $amount: 20);
 }
 
+.screen-main-left-top-bar-logo {
+    flex: 1;
+    padding: 0 20px;
+    font-size: 25px;
+    animation-name: rotate-logo-colors;
+    animation-duration: 30s;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+    color: $blue;
+}
+
+@keyframes rotate-logo-colors {
+    0% {
+        color: $blue;
+    }
+    25% {
+        color: $red;
+    }
+    50% {
+        color: $yellow;
+    }
+    75% {
+        color: $green;
+    }
+    100% {
+        color: $blue;
+    }
+}
+
 .screen-main-left-top-bar-separator {
     width: 1px;
     height: 15px;

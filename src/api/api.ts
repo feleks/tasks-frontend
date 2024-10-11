@@ -1,4 +1,4 @@
-import { AuthenticatedUser, Project, ProjectID } from './entities';
+import { AuthenticatedUser, Project, ProjectID, SongDetailed, SongBrief, SongID } from './entities';
 
 export interface Api {
     '/frontend/login': {
@@ -50,5 +50,22 @@ export interface Api {
             id: ProjectID;
         };
         response: null;
+    };
+
+    '/frontend/list_songs': {
+        request: null;
+        response: SongBrief[];
+    };
+    '/frontend/get_song': {
+        request: { id: SongID };
+        response: SongDetailed;
+    };
+    '/frontend/create_song': {
+        request: {
+            name: string;
+            format: string;
+            data: string;
+        };
+        response: SongBrief;
     };
 }

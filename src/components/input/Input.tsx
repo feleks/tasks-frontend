@@ -1,9 +1,8 @@
-import React, { ChangeEventHandler, useState } from 'react';
+import React, { ChangeEventHandler, FocusEventHandler, useState } from 'react';
 import { faEye, faEyeSlash, IconDefinition } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import classNames from 'classnames';
 // import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-
 import './Input.scss';
 
 interface Props {
@@ -14,10 +13,12 @@ interface Props {
     password?: boolean;
     className?: string;
     onChange?: ChangeEventHandler<HTMLInputElement>;
+    onBlur?: FocusEventHandler<HTMLInputElement>;
+    small?: boolean;
 }
 
 export function Input(props: Props) {
-    const { icon, label, value, name, password = false, onChange, className } = props;
+    const { onBlur, small, icon, label, value, name, password = false, onChange, className } = props;
 
     const [showPassword, setShowPassword] = useState(false);
 
@@ -46,8 +47,8 @@ export function Input(props: Props) {
     }
 
     const componentClassName = classNames('component-input', { 'has-icon': hasIcon }, className);
-    const inputClassNames = classNames('component-input-input', { 'has-icon': hasIcon, 'is-password': password });
-    const labelClassNames = classNames('component-input-label', { 'has-icon': hasIcon });
+    const inputClassNames = classNames('component-input-input', { 'has-icon': hasIcon, 'is-password': password, small });
+    const labelClassNames = classNames('component-input-label', { 'has-icon': hasIcon, small });
 
     let inputType = 'input';
     if (password && !showPassword) {
@@ -65,6 +66,7 @@ export function Input(props: Props) {
                 placeholder={label}
                 name={name}
                 onChange={onChange}
+                onBlur={onBlur}
             />
             <label className={labelClassNames} htmlFor={name}>
                 {label}

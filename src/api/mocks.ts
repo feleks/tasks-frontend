@@ -17,6 +17,8 @@ for (let i = 1; i <= 100; i++) {
     });
 }
 
+let lastSongID = 112312;
+
 export const mocks: Mocks = {
     '/frontend/login': (req) => {
         return {
@@ -76,6 +78,103 @@ export const mocks: Mocks = {
         }
 
         return null;
+    },
+
+    '/frontend/list_songs': (req) => {
+        // const rand = Math.random();
+        // if (rand < Math.random()) {
+        //     return [];
+        // } else if (rand < Math.random()) {
+        //     throw new Error('Произошла невероятная тестовая ошибко очень большой длины');
+        // }
+
+        return [
+            {
+                id: 1,
+                name: 'Chop Sue',
+                performer: 'System of a down',
+                format: 'flac'
+                // actions_history: [
+                //     {
+                //         id: 1,
+                //         type: 'navigate',
+                //         navigate: 1.35
+                //     },
+                //     {
+                //         id: 2,
+                //         type: 'loop',
+                //         loop: [10, 15]
+                //     }
+                // ],
+                // saved_actions: [
+                //     {
+                //         id: 3,
+                //         type: 'navigate',
+                //         name: 'Введение',
+                //         navigate: 13
+                //     },
+                //     {
+                //         id: 4,
+                //         type: 'loop',
+                //         name: 'Припев',
+                //         loop: [12, 22]
+                //     }
+                // ]
+            },
+            {
+                id: 2,
+                name: 'Chop Sue',
+                performer: 'System of a down',
+                format: 'mp3'
+            },
+            {
+                id: 3,
+                name: 'Taking Me Over',
+                performer: 'Hollowick',
+                format: 'mp3'
+            }
+        ];
+    },
+    '/frontend/get_song': (req) => {
+        return {
+            id: req.id,
+            name: 'Chop Sue',
+            performer: 'System of a down',
+            format: 'flac',
+            actions_history: [
+                {
+                    id: 1,
+                    type: 'navigate',
+                    navigate: 1.35
+                },
+                {
+                    id: 2,
+                    type: 'loop',
+                    loop: [10, 15]
+                }
+            ],
+            saved_actions: [
+                {
+                    id: 3,
+                    type: 'navigate',
+                    name: 'Введение',
+                    navigate: 13
+                },
+                {
+                    id: 4,
+                    type: 'loop',
+                    name: 'Припев',
+                    loop: [12, 22]
+                }
+            ]
+        };
+    },
+    '/frontend/create_song': (req) => {
+        return {
+            id: ++lastSongID,
+            name: req.name,
+            format: req.format
+        };
     }
 };
 

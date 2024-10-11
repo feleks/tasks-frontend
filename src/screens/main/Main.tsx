@@ -1,4 +1,4 @@
-import { faRightFromBracket, faUser } from '@fortawesome/free-solid-svg-icons';
+import { faDrum, faRightFromBracket, faUser } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { useEffect } from 'react';
 import { Route, Routes, useNavigate } from 'react-router-dom';
@@ -6,7 +6,7 @@ import { apiCall } from 'src/api/api_call';
 import { Button } from 'src/components/button/Button';
 import { useAuthStore } from 'src/stores/auth';
 import './Main.scss';
-import { ProjectSettings } from './project-settings/ProjectSettings';
+import { Songs } from './songs/Songs';
 import { Projects } from './projects/Projects';
 
 export function Main() {
@@ -33,13 +33,16 @@ export function Main() {
         <div className="screen-main">
             <div className="screen-main-left">
                 <div className="screen-main-left-top-bar segment">
+                    <div className="screen-main-left-top-bar-logo">
+                        <FontAwesomeIcon icon={faDrum} />
+                    </div>
                     <div className="screen-main-left-top-bar-separator"></div>
                     <div className="screen-main-left-top-bar-user">
                         <div className="screen-main-left-top-bar-user-icon">
                             <FontAwesomeIcon icon={faUser} />
                         </div>
                         <div className="screen-main-left-top-bar-user-right">
-                            <div className="screen-main-left-top-bar-user-right-title">User</div>
+                            <div className="screen-main-left-top-bar-user-right-title">Пользователь</div>
                             <div className="screen-main-left-top-bar-user-right-name">{user.name}</div>
                         </div>
                     </div>
@@ -61,21 +64,27 @@ export function Main() {
                     </div>
                 </div>
                 <Routes>
+                    <Route path="/songs" element={<Songs />} />
+                    <Route path="/songs/add" element={<Songs />} />
+                    <Route path="/songs/:id" element={<Songs />} />
+                    <Route path="/" element={<Songs />} />
+
                     <Route path="/projects" element={<Projects />} />
                     <Route path="/projects/settings/:id" element={<Projects />} />
-                    <Route path="/" element={<Projects />} />
                 </Routes>
             </div>
-            <Routes>
-                <Route
-                    path="/projects/settings/:id"
-                    element={
-                        <div className="screen-main-right">
-                            <ProjectSettings />
-                        </div>
-                    }
-                />
-            </Routes>
         </div>
     );
 }
+
+// <Route path="/projects/settings/:id" element={<Projects />} />
+// <Routes>
+//     <Route
+//         path="/projects/settings/:id"
+//         element={
+//             <div className="screen-main-right">
+//                 <ProjectSettings />
+//             </div>
+//         }
+//     />
+// </Routes>

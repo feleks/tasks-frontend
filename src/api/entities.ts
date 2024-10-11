@@ -19,3 +19,25 @@ export interface Project {
     id: ProjectID;
     title: string;
 }
+
+export type SongID = number;
+
+export interface SongAction {
+    id: number;
+    type: 'navigate' | 'loop';
+    name?: string;
+
+    navigate?: number;
+    loop?: [number, number];
+}
+
+export interface SongBrief {
+    id: SongID;
+    name: string;
+    performer?: string;
+    format: string;
+}
+export interface SongDetailed extends SongBrief {
+    actions_history: SongAction[];
+    saved_actions: SongAction[];
+}

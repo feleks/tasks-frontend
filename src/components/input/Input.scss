@@ -58,6 +58,18 @@
     &.is-password {
         padding-right: 40px;
     }
+    &.small {
+        height: 50px;
+        padding: 8px 7px 0 18px;
+
+        &:placeholder-shown ~ .component-input-label {
+            top: 17px;
+
+            font-size: 15px;
+
+            cursor: text;
+        }
+    }
 }
 
 .component-input-label {
@@ -77,6 +89,10 @@
 
     &.has-icon {
         left: 41px;
+    }
+    &.small {
+        top: 5px;
+        left: 20px;
     }
 }
 
@@ -98,6 +114,24 @@
 
         &.has-icon {
             left: 41px;
+        }
+    }
+
+    &.small {
+        ~ .component-input-label {
+            position: absolute;
+            top: 5px;
+            left: 20px;
+
+            display: block;
+
+            font-size: 12px;
+
+            transition: 0.2s;
+
+            &.has-icon {
+                left: 41px;
+            }
         }
     }
 }
