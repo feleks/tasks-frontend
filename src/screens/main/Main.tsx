@@ -8,6 +8,8 @@ import { useAuthStore } from 'src/stores/auth';
 import './Main.scss';
 import { Songs } from './songs/Songs';
 import { Projects } from './projects/Projects';
+import { ProjectSettings } from './project-settings/ProjectSettings';
+import { AddSong } from './songs/add-song/AddSong';
 
 export function Main() {
     const navigate = useNavigate();
@@ -73,6 +75,24 @@ export function Main() {
                     <Route path="/projects/settings/:id" element={<Projects />} />
                 </Routes>
             </div>
+            <Routes>
+                <Route
+                    path="/projects/settings/:id"
+                    element={
+                        <div className="screen-main-right">
+                            <ProjectSettings />
+                        </div>
+                    }
+                />
+                <Route
+                    path="/songs/add"
+                    element={
+                        <div className="screen-main-right">
+                            <AddSong />
+                        </div>
+                    }
+                />
+            </Routes>
         </div>
     );
 }

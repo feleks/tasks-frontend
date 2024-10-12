@@ -1,7 +1,7 @@
 import { Api } from './api';
 import { ApiError } from './errors';
 import { errorMiddlewares } from './middlewares';
-import { mocks, mocksEnabled, MOCKS_TIMEOUT } from './mocks';
+import { mocks, MOCKS_TIMEOUT, mocksEnabled } from './mocks';
 
 type MocksOptions = {
     useMocks?: boolean;
@@ -69,8 +69,9 @@ async function parseRequestResults(rawResponse: Response): Promise<any> {
         const errorName = errorInfo?.name;
         const errorDetails = errorInfo?.details;
         const errorDebugMessage = errorInfo?.debug_message;
+        const errorText = errorInfo?.text;
 
-        const apiError = new ApiError(errorName, errorDetails, errorDebugMessage);
+        const apiError = new ApiError(errorName, errorDetails, errorDebugMessage, errorText);
         throw apiError;
     } else if (res?.status === 'ok') {
         const payload = res?.payload;

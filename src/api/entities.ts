@@ -31,6 +31,8 @@ export interface SongAction {
     loop?: [number, number];
 }
 
+export type SongFormat = 'flac' | 'mp3';
+
 export interface SongBrief {
     id: SongID;
     name: string;

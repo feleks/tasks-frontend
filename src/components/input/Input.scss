@@ -69,6 +69,10 @@
 
             cursor: text;
         }
+
+        &.has-icon {
+            padding-left: 39px;
+        }
     }
 }
 
@@ -93,6 +97,10 @@
     &.small {
         top: 5px;
         left: 20px;
+
+        &.has-icon {
+            left: 41px;
+        }
     }
 }
 

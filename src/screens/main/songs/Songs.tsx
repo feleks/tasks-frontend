@@ -1,6 +1,6 @@
 import React, { useLayoutEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faExclamation, faList, faPlus, faRotateRight } from '@fortawesome/free-solid-svg-icons';
+import { faExclamation, faList, faPlus, faRotateRight, faSearch } from '@fortawesome/free-solid-svg-icons';
 import { Button } from '../../../components/button/Button';
 import './Songs.scss';
 import { listSongs, useSongStore } from '../../../stores/songs';
@@ -144,6 +144,7 @@ export function Songs() {
         <div className="screen-songs segment">
             <div className="screen-songs-top-panel">
                 <Input
+                    icon={faSearch}
                     className="screen-songs-search-input"
                     label="Поиск"
                     value={songListScreen.searchString}

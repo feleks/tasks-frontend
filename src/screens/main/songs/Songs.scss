@@ -1,8 +1,6 @@
 @import 'src/style/variables';
 
 .screen-songs {
-    margin: 0 20px;
-    padding-bottom: 20px;
 }
 
 .screen-songs-top-panel {
@@ -28,7 +26,7 @@
 // List
 .screen-songs-list {
     max-height: calc(100vh - 220px);
-    padding: 0 12px;
+    padding: 0 12px 12px 12px;
 
     overflow-y: auto;
 
@@ -49,6 +47,7 @@
 
 .screen-songs-list-item-wrapper {
     position: relative;
+    white-space: nowrap;
 }
 
 .screen-songs-list-item-separator {

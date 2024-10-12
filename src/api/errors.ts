@@ -9,8 +9,9 @@ export class ApiError<T extends keyof Errors> {
     public name: T;
     public details: Errors[T];
     public debugMessage?: string;
+    public text?: string;
 
-    constructor(name: T, details: Errors[T], debugMessage?: string) {
+    constructor(name: T, details: Errors[T], debugMessage?: string, text?: string) {
         const errorsSet = new Set(Object.keys(errors));
 
         if (!errorsSet.has(name)) {
@@ -19,6 +20,7 @@ export class ApiError<T extends keyof Errors> {
         this.name = name;
         this.details = details;
         this.debugMessage = debugMessage;
+        this.text = text;
     }
 
     static isApiError(e: any): boolean {

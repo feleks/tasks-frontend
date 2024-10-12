@@ -128,6 +128,18 @@ export const mocks: Mocks = {
                 format: 'mp3'
             },
             {
+                id: 24,
+                name: 'Unknown Song(',
+                format: 'mp3'
+            },
+            {
+                id: 25,
+                name: 'LonglongLonglongLonglongLonglongLonglongLonglongLonglongLonglong LonglongLonglongLonglongLonglong',
+                performer:
+                    'LonglongLonglongLonglongLonglongLonglongLonglongLonglongLonglongLonglongLonglongLonglongLonglongLonglong',
+                format: 'mp3'
+            },
+            {
                 id: 3,
                 name: 'Taking Me Over',
                 performer: 'Hollowick',
@@ -173,6 +185,7 @@ export const mocks: Mocks = {
         return {
             id: ++lastSongID,
             name: req.name,
+            performer: req.performer,
             format: req.format
         };
     }

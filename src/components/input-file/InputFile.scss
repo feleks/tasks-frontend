@@ -1,0 +1,28 @@
+@import 'src/style/variables';
+
+.component-input-file {
+    margin-bottom: 15px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    white-space: nowrap;
+    word-break: keep-all;
+}
+.component-input-file-label {
+    display: inline-block;
+    height: 60px;
+    line-height: 60px;
+}
+.component-input-file-input {
+    display: none;
+}
+.component-input-file-selected-file {
+    color: $yellow;
+    margin-left: 7px;
+    overflow: hidden;
+    white-space: normal;
+    //word-break: keep-all;
+    text-overflow: ellipsis;
+    //opacity: 0.85;
+    font-size: 13px;
+}
