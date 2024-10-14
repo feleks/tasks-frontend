@@ -1,6 +1,15 @@
 @import 'src/style/variables';
 
 .screen-app {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    padding: 20px;
+    height: 100vh;
+    min-height: 100vh;
+    max-height: 100vh;
+    overflow: hidden;
 }
 
 .screen-app-spinner {

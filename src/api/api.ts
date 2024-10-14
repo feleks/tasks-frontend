@@ -1,4 +1,4 @@
-import { AuthenticatedUser, Project, ProjectID, SongBrief, SongDetailed, SongFormat, SongID } from './entities';
+import { AuthenticatedUser, Project, ProjectID, SongAction, SongBrief, SongDetailed, SongFormat, SongID } from './entities';
 
 export interface Api {
     '/frontend/login': {
@@ -16,8 +16,6 @@ export interface Api {
         request: {
             login: string;
             password: string;
-            name: string;
-            email: string;
         };
         response: AuthenticatedUser;
     };
@@ -54,7 +52,7 @@ export interface Api {
 
     '/frontend/list_songs': {
         request: null;
-        response: SongBrief[];
+        response: { songs: SongBrief[] };
     };
     '/frontend/get_song': {
         request: { id: SongID };
@@ -65,8 +63,31 @@ export interface Api {
             name: string;
             performer?: string;
             format: SongFormat;
-            data: string;
         };
         response: SongBrief;
+    };
+
+    '/frontend/create_action': {
+        request: {
+            song_id: SongID;
+            type: 'point' | 'loop';
+            point?: number;
+            loop?: [number, number];
+        };
+        response: SongAction;
+    };
+    '/frontend/update_action': {
+        request: {
+            id: number;
+            name?: string;
+            position?: number;
+        };
+        response: null;
+    };
+    '/frontend/delete_action': {
+        request: {
+            id: number;
+        };
+        response: null;
     };
 }

@@ -10,7 +10,7 @@ interface Props {
     submit?: boolean;
     loading?: boolean;
     className?: string;
-    style?: 'blue' | 'grey' | 'red';
+    style?: 'blue' | 'grey' | 'red' | 'yellow' | 'green';
     onClick?: React.MouseEventHandler;
 }
 

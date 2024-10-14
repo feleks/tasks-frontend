@@ -17,7 +17,10 @@ for (let i = 1; i <= 100; i++) {
     });
 }
 
-let lastSongID = 112312;
+let lastSongID = 0;
+function getSongID(): number {
+    return lastSongID++;
+}
 
 export const mocks: Mocks = {
     '/frontend/login': (req) => {
@@ -38,9 +41,7 @@ export const mocks: Mocks = {
     },
     '/frontend/sign_up': (req) => {
         return {
-            login: req.login,
-            email: req.email,
-            name: req.name
+            login: req.login
         };
     },
     '/frontend/logout': () => {
@@ -88,64 +89,48 @@ export const mocks: Mocks = {
         //     throw new Error('Произошла невероятная тестовая ошибко очень большой длины');
         // }
 
-        return [
+        const list = [
             {
-                id: 1,
+                id: getSongID(),
                 name: 'Chop Sue',
                 performer: 'System of a down',
                 format: 'flac'
-                // actions_history: [
-                //     {
-                //         id: 1,
-                //         type: 'navigate',
-                //         navigate: 1.35
-                //     },
-                //     {
-                //         id: 2,
-                //         type: 'loop',
-                //         loop: [10, 15]
-                //     }
-                // ],
-                // saved_actions: [
-                //     {
-                //         id: 3,
-                //         type: 'navigate',
-                //         name: 'Введение',
-                //         navigate: 13
-                //     },
-                //     {
-                //         id: 4,
-                //         type: 'loop',
-                //         name: 'Припев',
-                //         loop: [12, 22]
-                //     }
-                // ]
             },
             {
-                id: 2,
+                id: getSongID(),
                 name: 'Chop Sue',
                 performer: 'System of a down',
                 format: 'mp3'
             },
             {
-                id: 24,
+                id: getSongID(),
                 name: 'Unknown Song(',
                 format: 'mp3'
             },
             {
-                id: 25,
+                id: getSongID(),
                 name: 'LonglongLonglongLonglongLonglongLonglongLonglongLonglongLonglong LonglongLonglongLonglongLonglong',
                 performer:
                     'LonglongLonglongLonglongLonglongLonglongLonglongLonglongLonglongLonglongLonglongLonglongLonglongLonglong',
                 format: 'mp3'
             },
             {
-                id: 3,
+                id: getSongID(),
                 name: 'Taking Me Over',
                 performer: 'Hollowick',
                 format: 'mp3'
             }
         ];
+
+        for (let i = 10; i < 100; i++) {
+            list.push({
+                id: getSongID(),
+                name: `Taking Me Over ${i}`,
+                performer: 'Hollowick',
+                format: 'mp3'
+            });
+        }
+        return { songs: list };
     },
     '/frontend/get_song': (req) => {
         return {
@@ -153,29 +138,32 @@ export const mocks: Mocks = {
             name: 'Chop Sue',
             performer: 'System of a down',
             format: 'flac',
-            actions_history: [
+            actions: [
                 {
-                    id: 1,
-                    type: 'navigate',
-                    navigate: 1.35
-                },
-                {
-                    id: 2,
-                    type: 'loop',
-                    loop: [10, 15]
-                }
-            ],
-            saved_actions: [
-                {
-                    id: 3,
-                    type: 'navigate',
+                    id: getSongID(),
+                    type: 'point',
+                    created_at: new Date().toISOString(),
                     name: 'Введение',
-                    navigate: 13
+                    point: 13
                 },
                 {
-                    id: 4,
+                    id: getSongID(),
+                    type: 'point',
+                    created_at: new Date().toISOString(),
+                    name: 'Введение',
+                    point: 13
+                },
+                {
+                    id: getSongID(),
+                    type: 'point',
+                    created_at: new Date().toISOString(),
+                    point: 13
+                },
+                {
+                    id: getSongID(),
                     type: 'loop',
-                    name: 'Припев',
+                    created_at: new Date().toISOString(),
+                    name: 'Припев Припев Припев Припев ПрипевПрипевПрипевПрипевПрипевПрипевПрипевПрипевПрипевПрипевПрипевПрипевПрипевПрипевПрипевПрипев',
                     loop: [12, 22]
                 }
             ]
@@ -183,15 +171,32 @@ export const mocks: Mocks = {
     },
     '/frontend/create_song': (req) => {
         return {
-            id: ++lastSongID,
+            id: getSongID(),
             name: req.name,
             performer: req.performer,
             format: req.format
         };
+    },
+    '/frontend/create_action': (req) => {
+        return {
+            id: getSongID(),
+            type: req.type,
+            created_at: new Date().toISOString(),
+            point: req.point,
+            loop: req.loop
+        };
+    },
+    '/frontend/update_action': (req) => {
+        return null;
+    },
+    '/frontend/delete_action': (req) => {
+        return null;
     }
 };
 
 export function mocksEnabled(): boolean {
+    return false;
+
     if (MOCKS_MODE === 'default') {
         return process.env.NODE_ENV === 'development';
     }

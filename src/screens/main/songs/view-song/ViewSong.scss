@@ -1,0 +1,71 @@
+@import 'src/style/variables';
+
+.screen-view-song {
+    display: flex;
+    flex-direction: column;
+    justify-content: stretch;
+    margin-left: 0;
+}
+
+.screen-view-song-top-panel-loading {
+    svg {
+        margin-right: 8px;
+        color: $blue;
+    }
+}
+.screen-view-song-top-panel-back {
+    cursor: pointer;
+
+    svg {
+        margin-right: 8px;
+    }
+
+    &:hover {
+        svg {
+            color: $red;
+        }
+    }
+}
+
+.screen-view-song-top-panel {
+    padding: 12px 20px 0 20px;
+
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    height: 50px;
+    color: $text-primary-color;
+    font-size: 17px;
+    transition: color 0.5s ease;
+}
+
+.screen-view-song-content {
+    padding: 0 12px 12px 12px;
+    overflow: hidden;
+}
+
+// Error
+.screen-view-song-content-error {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    height: 275px;
+}
+
+.screen-view-song-content-error-icon {
+    color: $red;
+    font-size: 30px;
+}
+
+.screen-view-song-content-error-text {
+    margin-top: 20px;
+
+    color: white;
+}
+
+.screen-view-song-content-error-reload {
+    margin-top: 20px;
+}

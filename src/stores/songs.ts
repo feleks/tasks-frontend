@@ -6,13 +6,17 @@ import { apiCall } from '../api/api_call';
 
 interface SongStore {
     songBriefStorage: Map<SongID, SongBrief>;
-    songDetailedStorage: Map<SongID, Omit<SongDetailed, keyof SongBrief>>;
+    songDetailedStorage: Map<SongID, SongDetailed>;
 
     songListScreen: {
         songs: SongID[];
         searchString: string;
         state: ScreenState;
         loadingMore: boolean;
+    };
+
+    songScreen: {
+        state: ScreenState;
     };
 
     songsListScreenAddSongs(songs: SongBrief[], replace?: boolean): void;
@@ -31,6 +35,12 @@ export const useSongStore = create<SongStore>()((set) => ({
             status: 'loading'
         },
         loadingMore: false
+    },
+
+    songScreen: {
+        state: {
+            status: 'loading'
+        }
     },
 
     songsListScreenAddSongs(songs: SongBrief[], replace = false): void {
@@ -115,9 +125,9 @@ export async function listSongs(replace: boolean) {
     try {
         const res = await apiCall('/frontend/list_songs', null);
 
-        songStore.songsListScreenAddSongs(res, replace);
+        songStore.songsListScreenAddSongs(res.songs, replace);
     } catch (e) {
-        songStore.songsListScreenGetError(`${e}`);
+        songStore.songsListScreenGetError('Неизвестная ошибка');
         throw e;
     }
 }

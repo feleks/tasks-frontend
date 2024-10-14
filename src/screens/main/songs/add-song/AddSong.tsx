@@ -6,7 +6,6 @@ import { InputFile } from '../../../../components/input-file/InputFile';
 import { useNotificationStore } from '../../../../stores/notification';
 import { apiCall } from '../../../../api/api_call';
 import { SongBrief, SongFormat } from '../../../../api/entities';
-import { ApiError } from '../../../../api/errors';
 import { listSongs } from '../../../../stores/songs';
 import { useNavigate } from 'react-router-dom';
 import { faChevronLeft } from '@fortawesome/free-solid-svg-icons';
@@ -56,29 +55,25 @@ export function AddSong() {
                 );
             }
 
-            let data: string;
-            try {
-                data = await toBase64(file);
-            } catch (e) {
-                console.error(e);
-                return showNotification('error', `Неудалось преобразовать файл в base64`);
-            }
-
             let song: SongBrief;
             try {
-                song = await apiCall('/frontend/create_song', {
-                    name: name,
-                    performer: performer.length > 0 ? performer : undefined,
-                    format,
-                    data
-                });
+                song = await apiCall(
+                    '/frontend/create_song',
+                    {
+                        name: name,
+                        performer: performer.length > 0 ? performer : undefined,
+                        format
+                    },
+                    { files: [file] }
+                );
             } catch (e) {
                 console.error(e);
-                if (e instanceof ApiError) {
-                    return showNotification('error', e.text ?? 'Не удалось создать песню');
-                } else {
-                    return showNotification('error', 'Не удалось создать песню');
-                }
+                return;
+                // if (e instanceof ApiError) {
+                //     return showNotification('error', e.text ?? 'Не удалось создать песню');
+                // } else {
+                //     return showNotification('error', 'Не удалось создать песню');
+                // }
             }
 
             showNotification('success', `Песня ${song.name} успешно загружена`);
@@ -112,7 +107,7 @@ export function AddSong() {
                 </span>
             </div>
             <form
-                className="screen-add-form"
+                className="screen-add-song-form"
                 onSubmit={(e) => {
                     e.preventDefault();
 

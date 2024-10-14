@@ -7,9 +7,8 @@ import { Button } from 'src/components/button/Button';
 import { useAuthStore } from 'src/stores/auth';
 import './Main.scss';
 import { Songs } from './songs/Songs';
-import { Projects } from './projects/Projects';
-import { ProjectSettings } from './project-settings/ProjectSettings';
 import { AddSong } from './songs/add-song/AddSong';
+import { ViewSong } from './songs/view-song/ViewSong';
 
 export function Main() {
     const navigate = useNavigate();
@@ -31,80 +30,97 @@ export function Main() {
         await apiCall('/frontend/logout', null);
     }
 
+    // const cnt = [];
+    // for (let i = 0; i < 1000; i++) {
+    //     cnt.push(<div key={i}>{i + 1}) !!!!!!!</div>);
+    // }
+
     return (
-        <div className="screen-main">
-            <div className="screen-main-left">
-                <div className="screen-main-left-top-bar segment">
-                    <div className="screen-main-left-top-bar-logo">
-                        <FontAwesomeIcon icon={faDrum} />
+        <>
+            <div className="screen-main-left-top-bar segment">
+                <div className="screen-main-left-top-bar-logo">
+                    <FontAwesomeIcon icon={faDrum} />
+                </div>
+                <div className="screen-main-left-top-bar-user">
+                    <div className="screen-main-left-top-bar-user-icon">
+                        <FontAwesomeIcon icon={faUser} />
                     </div>
-                    <div className="screen-main-left-top-bar-separator"></div>
-                    <div className="screen-main-left-top-bar-user">
-                        <div className="screen-main-left-top-bar-user-icon">
-                            <FontAwesomeIcon icon={faUser} />
-                        </div>
-                        <div className="screen-main-left-top-bar-user-right">
-                            <div className="screen-main-left-top-bar-user-right-title">Пользователь</div>
-                            <div className="screen-main-left-top-bar-user-right-name">{user.name}</div>
-                        </div>
-                    </div>
-                    <div className="screen-main-left-top-bar-separator"></div>
-                    <div className="screen-main-left-top-bar-user-exit">
-                        <Button
-                            className="screen-main-left-top-bar-user-exit-button"
-                            style="red"
-                            value={
-                                <span>
-                                    <FontAwesomeIcon className="exit-icon" icon={faRightFromBracket} />
-                                </span>
-                            }
-                            small
-                            onClick={() => {
-                                logout();
-                            }}
-                        />
+                    <div className="screen-main-left-top-bar-user-right">
+                        <div className="screen-main-left-top-bar-user-right-title">Пользователь</div>
+                        <div className="screen-main-left-top-bar-user-right-name">{user.login}</div>
                     </div>
                 </div>
+                <div className="screen-main-left-top-bar-separator"></div>
+                <div className="screen-main-left-top-bar-user-exit">
+                    <Button
+                        className="screen-main-left-top-bar-user-exit-button"
+                        style="red"
+                        value={
+                            <span>
+                                <FontAwesomeIcon className="exit-icon" icon={faRightFromBracket} />
+                            </span>
+                        }
+                        small
+                        onClick={() => {
+                            logout();
+                        }}
+                    />
+                </div>
+            </div>
+            <div className="screen-main-content segment">
                 <Routes>
                     <Route path="/songs" element={<Songs />} />
-                    <Route path="/songs/add" element={<Songs />} />
-                    <Route path="/songs/:id" element={<Songs />} />
                     <Route path="/" element={<Songs />} />
-
-                    <Route path="/projects" element={<Projects />} />
-                    <Route path="/projects/settings/:id" element={<Projects />} />
+                    <Route
+                        path="/songs/add"
+                        element={
+                            <div className="screen-main-right">
+                                <AddSong />
+                            </div>
+                        }
+                    />
+                    <Route
+                        path="/songs/:id"
+                        element={
+                            <div className="screen-main-right">
+                                <ViewSong />
+                            </div>
+                        }
+                    />
                 </Routes>
             </div>
-            <Routes>
-                <Route
-                    path="/projects/settings/:id"
-                    element={
-                        <div className="screen-main-right">
-                            <ProjectSettings />
-                        </div>
-                    }
-                />
-                <Route
-                    path="/songs/add"
-                    element={
-                        <div className="screen-main-right">
-                            <AddSong />
-                        </div>
-                    }
-                />
-            </Routes>
-        </div>
+
+            {/* <Routes>*/}
+            {/*    <Route path="/songs" element={<Songs />} />*/}
+            {/*    <Route path="/" element={<Songs />} />*/}
+            {/* </Routes>*/}
+
+            {/* <Routes>*/}
+            {/*    <Route*/}
+            {/*        path="/projects/settings/:id"*/}
+            {/*        element={*/}
+            {/*            <div className="screen-main-right">*/}
+            {/*                <ProjectSettings />*/}
+            {/*            </div>*/}
+            {/*        }*/}
+            {/*    />*/}
+            {/*    <Route*/}
+            {/*        path="/songs/add"*/}
+            {/*        element={*/}
+            {/*            <div className="screen-main-right">*/}
+            {/*                <AddSong />*/}
+            {/*            </div>*/}
+            {/*        }*/}
+            {/*    />*/}
+            {/*    <Route*/}
+            {/*        path="/songs/:id"*/}
+            {/*        element={*/}
+            {/*            <div className="screen-main-right">*/}
+            {/*                <ViewSong />*/}
+            {/*            </div>*/}
+            {/*        }*/}
+            {/*    />*/}
+            {/* </Routes>*/}
+        </>
     );
 }
-
-// <Route path="/projects/settings/:id" element={<Projects />} />
-// <Routes>
-//     <Route
-//         path="/projects/settings/:id"
-//         element={
-//             <div className="screen-main-right">
-//                 <ProjectSettings />
-//             </div>
-//         }
-//     />
-// </Routes>

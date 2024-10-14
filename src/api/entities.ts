@@ -3,14 +3,10 @@ export type UserID = number;
 export interface User {
     id: UserID;
     login: string;
-    name: string;
 }
 
 export interface AuthenticatedUser {
     login: string;
-    name: string;
-    email: string;
-    phone?: string;
 }
 
 export type ProjectID = number;
@@ -24,10 +20,11 @@ export type SongID = number;
 
 export interface SongAction {
     id: number;
-    type: 'navigate' | 'loop';
+    type: 'point' | 'loop';
+    created_at: string;
     name?: string;
 
-    navigate?: number;
+    point?: number;
     loop?: [number, number];
 }
 
@@ -40,6 +37,5 @@ export interface SongBrief {
     format: string;
 }
 export interface SongDetailed extends SongBrief {
-    actions_history: SongAction[];
-    saved_actions: SongAction[];
+    actions: SongAction[];
 }

@@ -15,6 +15,8 @@
     border-radius: $inner-border-radius;
 
     cursor: pointer;
+    outline: none;
+    -webkit-tap-highlight-color: rgba(255, 255, 255, 0);
 
     transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
 
@@ -27,7 +29,7 @@
     }
 
     &.loading {
-        color: transparent;
+        color: transparent !important;
 
         .component-button-spinner {
             color: white;
@@ -58,14 +60,48 @@
         }
     }
 
+    &.style-yellow {
+        color: $text-secondary-color;
+        background-color: $yellow;
+
+        &:hover {
+            background-color: darken($color: $yellow, $amount: 7);
+        }
+
+        &:active {
+            background-color: darken($color: $yellow, $amount: 14);
+        }
+
+        &.loading .component-button-spinner {
+            color: $text-secondary-color;
+        }
+    }
+
+    &.style-green {
+        color: $text-secondary-color;
+        background-color: $green;
+
+        &:hover {
+            background-color: darken($color: $green, $amount: 7);
+        }
+
+        &:active {
+            background-color: darken($color: $green, $amount: 14);
+        }
+
+        &.loading .component-button-spinner {
+            color: $text-secondary-color;
+        }
+    }
+
     &.style-grey {
         border: 1px solid #6b707a;
 
         background-color: transparent;
 
-        &:hover {
-            background-color: #6b707a;
-        }
+        //&:hover {
+        //    background-color: #6b707a;
+        //}
 
         &:active {
             border-color: darken($color: #6b707a, $amount: 14);

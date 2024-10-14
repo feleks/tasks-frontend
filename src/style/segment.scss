@@ -3,12 +3,47 @@
 .segment {
     position: relative;
 
-    margin: 0 20px;
-    //padding-bottom: 12px;
+    border-radius: $outer-border-radius;
+
+    background-color: #323741;
+
+    box-shadow: 0px 12px 31px -2px rgba(0, 0, 0, 0.1);
+
+    max-width: 600px;
+
+    &:before {
+        position: absolute;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        right: 0;
+        content: '';
+        z-index: -1;
+
+        margin: -0.8px;
+
+        font-weight: 700;
+
+        border-radius: inherit;
+
+        background: linear-gradient(to right, #4b525c, #323741);
+    }
+}
+
+@media only screen and (min-width: 640px) {
+    .segment {
+        width: 600px;
+        margin: 0 auto;
+    }
+}
+
+.notification-segment {
+    position: relative;
 
     border-radius: $outer-border-radius;
 
     background-color: #323741;
+    width: 100%;
 
     box-shadow: 0px 12px 31px -2px rgba(0, 0, 0, 0.1);
 

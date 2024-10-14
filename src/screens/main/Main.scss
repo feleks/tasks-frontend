@@ -1,17 +1,11 @@
 @import 'src/style/variables';
 
-.screen-main {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: stretch;
-
-    min-height: 100vh;
-}
-
-.screen-main-left {
-    width: 600px;
-}
+//.screen-main {
+//    display: flex;
+//    flex-direction: row;
+//    justify-content: center;
+//    align-items: stretch;
+//}
 
 .screen-main-left-top-bar {
     display: flex;
@@ -20,7 +14,6 @@
     align-items: center;
 
     height: 70px;
-    margin: 20px;
 
     color: darken($color: white, $amount: 20);
 }
@@ -107,8 +100,8 @@
     font-family: 'Open Sans', sans-serif;
 }
 
-// Right
-.screen-main-right {
-    width: 600px;
-    margin-top: 110px;
+.screen-main-content {
+    margin-top: 20px;
+    //max-height: calc(100vh - 130px);
+    overflow: hidden;
 }

@@ -61,7 +61,7 @@ export function Notification(props: Props) {
 
     return (
         <div ref={containerRef} className={classNames('component-notification', notification.type)}>
-            <div ref={bodyRef} className={classNames('component-notification-body', 'segment')}>
+            <div ref={bodyRef} className={classNames('component-notification-body', 'notification-segment')}>
                 <div className="component-notification-body-icon">{iconFragment}</div>
                 <div className="component-notification-body-message">{notification.message}</div>
                 <div ref={progressRef} className="component-notification-body-progress">

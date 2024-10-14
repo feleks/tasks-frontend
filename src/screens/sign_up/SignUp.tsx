@@ -16,10 +16,10 @@ export function SignUp() {
 
     const [loading, setLoading] = useState(false);
     const [login, setLogin] = useState('');
-    const [name, setName] = useState('');
+    // const [name, setName] = useState('');
     const [password, setPassword] = useState('');
     const [passwordRepeat, setPasswordRepeat] = useState('');
-    const [email, setEmail] = useState('');
+    // const [email, setEmail] = useState('');
 
     async function signUp() {
         if (loading) {
@@ -27,10 +27,10 @@ export function SignUp() {
         }
         if (
             login.length === 0 ||
-            name.length === 0 ||
+            // name.length === 0 ||
             password.length === 0 ||
-            passwordRepeat.length === 0 ||
-            email.length === 0
+            passwordRepeat.length === 0
+            // email.length === 0
         ) {
             showNotification('error', 'All fields must be filled');
             return;
@@ -45,9 +45,9 @@ export function SignUp() {
         try {
             const user = await apiCall('/frontend/sign_up', {
                 login,
-                password,
-                email,
-                name
+                password
+                // email,
+                // name
             });
 
             markAuthenticated(user);
@@ -76,14 +76,14 @@ export function SignUp() {
                     setLogin(event.target.value);
                 }}
             />
-            <Input
-                label="Name"
-                name="name"
-                value={name}
-                onChange={(event) => {
-                    setName(event.target.value);
-                }}
-            />
+            {/* <Input*/}
+            {/*    label="Name"*/}
+            {/*    name="name"*/}
+            {/*    value={name}*/}
+            {/*    onChange={(event) => {*/}
+            {/*        setName(event.target.value);*/}
+            {/*    }}*/}
+            {/* />*/}
             <Input
                 label="Password"
                 name="password"
@@ -102,14 +102,14 @@ export function SignUp() {
                     setPasswordRepeat(event.target.value);
                 }}
             />
-            <Input
-                label="Email"
-                name="email"
-                value={email}
-                onChange={(event) => {
-                    setEmail(event.target.value);
-                }}
-            />
+            {/* <Input*/}
+            {/*    label="Email"*/}
+            {/*    name="email"*/}
+            {/*    value={email}*/}
+            {/*    onChange={(event) => {*/}
+            {/*        setEmail(event.target.value);*/}
+            {/*    }}*/}
+            {/* />*/}
             <div className="screen-sign-up-buttons">
                 <Button className="screen-sign-up-buttons-sign-up" value="Sign up" submit loading={loading} />
                 <Link to="/login">
