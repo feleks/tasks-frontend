@@ -87,6 +87,8 @@ export function Main() {
                             </div>
                         }
                     />
+
+                    <Route path="*" element={<div className="screen-not-found">4o4</div>} />
                 </Routes>
             </div>
 

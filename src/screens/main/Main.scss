@@ -22,29 +22,11 @@
     flex: 1;
     padding: 0 20px;
     font-size: 25px;
-    animation-name: rotate-logo-colors;
-    animation-duration: 30s;
-    animation-timing-function: linear;
-    animation-iteration-count: infinite;
-    color: $blue;
-}
-
-@keyframes rotate-logo-colors {
-    0% {
-        color: $blue;
-    }
-    25% {
-        color: $red;
-    }
-    50% {
-        color: $yellow;
-    }
-    75% {
-        color: $green;
-    }
-    100% {
-        color: $blue;
-    }
+    //animation-name: rotate-logo-colors;
+    //animation-duration: 30s;
+    //animation-timing-function: linear;
+    //animation-iteration-count: infinite;
+    color: $red;
 }
 
 .screen-main-left-top-bar-separator {
@@ -104,4 +86,41 @@
     margin-top: 20px;
     //max-height: calc(100vh - 130px);
     overflow: hidden;
+}
+
+.screen-not-found {
+    width: 100%;
+    text-align: center;
+    height: calc(100vh - 200px);
+    max-height: 500px;
+    font-size: 100px;
+    color: $blue;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-shadow: rgba(0, 0, 0, 0.2) 2px 5px;
+
+    animation-name: rotate-logo-colors;
+    animation-duration: 30s;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+}
+
+@keyframes rotate-logo-colors {
+    0% {
+        color: $blue;
+    }
+    25% {
+        color: $red;
+    }
+    50% {
+        color: $yellow;
+    }
+    75% {
+        color: $green;
+    }
+    100% {
+        color: $blue;
+    }
 }
