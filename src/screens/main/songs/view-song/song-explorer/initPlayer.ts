@@ -1,5 +1,5 @@
 import { RefObject } from 'react';
-import { SongID } from '../../../../../api/entities';
+import { SongBrief } from '../../../../../api/entities';
 
 function waitForAudio(audio: HTMLAudioElement): Promise<void> {
     return new Promise((resolve, reject) => {
@@ -15,28 +15,47 @@ function waitForAudio(audio: HTMLAudioElement): Promise<void> {
     });
 }
 
-export async function initPlayer(
-    songID: SongID,
+// export async function initPlayer(
+//     songID: SongID,
+//     audioRef: RefObject<HTMLAudioElement>,
+//     audioSourceRef: RefObject<HTMLSourceElement>
+// ) {
+//     const res = await fetch(`/frontend/download_song/${songID}`);
+//     const blob = await res.blob();
+//     const blobOU = window.URL.createObjectURL(blob);
+//
+//     const audioElem = audioRef.current;
+//     const audioSourceElem = audioSourceRef.current;
+//     if (audioElem == null || audioSourceElem == null) {
+//         throw new Error('audioElem or audioSourceElem is null');
+//     }
+//
+//     const contentType = res.headers.get('Content-Type');
+//     if (contentType == null) {
+//         throw new Error('contentType is null');
+//     }
+//
+//     audioSourceElem.setAttribute('src', blobOU);
+//     audioSourceElem.setAttribute('type', contentType);
+//
+//     audioElem.load();
+//     audioElem.volume = 0.4;
+//
+//     await waitForAudio(audioElem);
+// }
+
+export async function initPlayer2(
+    song: SongBrief,
     audioRef: RefObject<HTMLAudioElement>,
     audioSourceRef: RefObject<HTMLSourceElement>
 ) {
-    const res = await fetch(`/frontend/download_song/${songID}`);
-    const blob = await res.blob();
-    const blobOU = window.URL.createObjectURL(blob);
-
     const audioElem = audioRef.current;
     const audioSourceElem = audioSourceRef.current;
     if (audioElem == null || audioSourceElem == null) {
         throw new Error('audioElem or audioSourceElem is null');
     }
 
-    const contentType = res.headers.get('Content-Type');
-    if (contentType == null) {
-        throw new Error('contentType is null');
-    }
-
-    audioSourceElem.setAttribute('src', blobOU);
-    audioSourceElem.setAttribute('type', contentType);
+    audioSourceElem.setAttribute('src', `/frontend/download_song/${song.id}`);
 
     audioElem.load();
     audioElem.volume = 0.4;

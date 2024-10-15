@@ -87,8 +87,29 @@ export function Main() {
                             </div>
                         }
                     />
+                    <Route
+                        path="/songs/settings/:id"
+                        element={
+                            <div className="screen-main-right">
+                                <ViewSong />
+                            </div>
+                        }
+                    />
 
-                    <Route path="*" element={<div className="screen-not-found">4o4</div>} />
+                    <Route
+                        path="*"
+                        element={
+                            <div className="screen-not-found">
+                                <div className="screen-not-found-404">4o4</div>
+                                <Button
+                                    value="На главную"
+                                    onClick={() => {
+                                        navigate('/');
+                                    }}
+                                />
+                            </div>
+                        }
+                    />
                 </Routes>
             </div>
 

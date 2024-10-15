@@ -75,3 +75,56 @@
 
     border-bottom: 1px solid #2a2f39;
 }
+
+.segment-title-back {
+    padding: 12px 20px;
+
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    height: 74px;
+    color: $text-primary-color;
+    font-size: 17px;
+    transition: color 0.5s ease;
+
+    span {
+        cursor: pointer;
+
+        svg {
+            margin-right: 8px;
+        }
+
+        &:hover {
+            svg {
+                color: $red;
+            }
+        }
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+.segment-error {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    height: 275px;
+}
+
+.segment-error-icon {
+    color: $red;
+    font-size: 30px;
+}
+
+.segment-error-text {
+    margin-top: 20px;
+
+    color: white;
+}
+
+.segment-error-reload {
+    margin-top: 20px;
+}

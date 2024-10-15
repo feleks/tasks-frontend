@@ -191,6 +191,12 @@ export const mocks: Mocks = {
     },
     '/frontend/delete_action': (req) => {
         return null;
+    },
+    '/frontend/update_song': (req) => {
+        return null;
+    },
+    '/frontend/delete_song': (req) => {
+        return null;
     }
 };
 

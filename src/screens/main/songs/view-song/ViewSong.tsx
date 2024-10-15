@@ -1,6 +1,6 @@
 import React, { useLayoutEffect, useState } from 'react';
 import './ViewSong.scss';
-import { faChevronLeft, faExclamation, faRotateRight, faSpinner } from '@fortawesome/free-solid-svg-icons';
+import { faChevronLeft, faExclamation, faPenToSquare, faRotateRight, faSpinner } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Button } from '../../../../components/button/Button';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -9,12 +9,14 @@ import { apiCall } from '../../../../api/api_call';
 import { SongDetailed } from '../../../../api/entities';
 import { ApiError } from '../../../../api/errors';
 import { SongExplorer } from './song-explorer/SongExplorer';
+import classNames from 'classnames';
 
 export function ViewSong() {
     const { id: idRaw } = useParams<{ id: string }>();
     const songID = parseInt(idRaw ?? '0');
     const navigate = useNavigate();
     const [screenState, setScreenState] = useState<PayloadScreenState<SongDetailed>>({ status: 'loading' });
+    const [songModal, setSongModal] = useState<boolean>(false);
 
     async function getSong() {
         setScreenState({ status: 'loading' });
@@ -64,14 +66,28 @@ export function ViewSong() {
         const song = screenState.payload;
 
         title = (
-            <span
-                className="screen-view-song-top-panel-back"
-                onClick={() => {
-                    navigate('/songs');
-                }}
-            >
-                <FontAwesomeIcon icon={faChevronLeft} /> {song == null ? 'Назад' : song.name}
-            </span>
+            <>
+                <div
+                    className="screen-view-song-top-panel-back"
+                    onClick={() => {
+                        navigate('/songs');
+                    }}
+                >
+                    <FontAwesomeIcon icon={faChevronLeft} />
+                    <div className="screen-view-song-top-panel-back-title">{song == null ? 'Назад' : song.name}</div>
+                </div>
+                <div className={classNames('screen-view-song-top-panel-settings', { 'in-progress': songModal })}>
+                    <Button
+                        style="grey"
+                        onClick={() => {
+                            setSongModal(true);
+                        }}
+                        value={<FontAwesomeIcon icon={faPenToSquare} />}
+                        small
+                    />
+                    {/* <FontAwesomeIcon icon={faGear} />*/}
+                </div>
+            </>
         );
 
         if (screenState.status === 'error' || song == null) {
@@ -97,7 +113,12 @@ export function ViewSong() {
         } else {
             content = (
                 <SongExplorer
+                    key={song.id}
                     song={song}
+                    songModal={songModal}
+                    closeSongModal={() => {
+                        setSongModal(false);
+                    }}
                     setError={(err) => {
                         setScreenState({
                             status: 'error',

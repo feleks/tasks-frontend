@@ -66,6 +66,20 @@ export interface Api {
         };
         response: SongBrief;
     };
+    '/frontend/update_song': {
+        request: {
+            id: SongID;
+            name: string;
+            performer?: string;
+        };
+        response: null;
+    };
+    '/frontend/delete_song': {
+        request: {
+            id: SongID;
+        };
+        response: null;
+    };
 
     '/frontend/create_action': {
         request: {

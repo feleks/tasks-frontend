@@ -16,20 +16,29 @@ import {
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import classNames from 'classnames';
 import { mountListeners } from './mountListeners';
-import { initPlayer } from './initPlayer';
 import { secondsToStr } from './utils';
 import { apiCall } from '../../../../../api/api_call';
 import moment from 'moment';
+import { initPlayer2 } from './initPlayer';
+import { Input } from '../../../../../components/input/Input';
+import { useNotificationStore } from '../../../../../stores/notification';
+import { useNavigate } from 'react-router-dom';
 
 interface Props {
     song: SongDetailed;
+    songModal: boolean;
+
     setError(err: string): void;
+    closeSongModal(): void;
+}
+
+interface modal {
+    type: 'rename_action' | 'delete_action' | 'update_song';
+    song: SongDetailed;
+    action?: SongAction;
 }
 
 const speedOptions = [80, 85, 90, 95, 100];
-
-const deleteActionsLoading = new Set<number>();
-const renameActionsLoading = new Set<number>();
 export function SongExplorer(props: Props) {
     const { song, setError } = props;
 
@@ -44,6 +53,7 @@ export function SongExplorer(props: Props) {
     const [temporaryLoop, setTemporaryLoop] = useState<[number, number] | null>(null);
     // eslint-disable-next-line no-unused-vars
     const [_, rerender] = useState<number>(0);
+    const [modal, setModal] = useState<modal | null>(null);
 
     const playerRef = useRef<HTMLDivElement>(null);
     const playerBorderRef = useRef<HTMLDivElement>(null);
@@ -73,10 +83,18 @@ export function SongExplorer(props: Props) {
             unmount();
         };
     }, []);
+    useEffect(() => {
+        if (props.songModal) {
+            setModal({ type: 'update_song', song });
+        } else {
+            setModal(null);
+        }
+    }, [props.songModal]);
 
     async function localInitPlayer() {
         try {
-            await initPlayer(song.id, audioRef, audioSourceRef);
+            // await initPlayer(song.id, audioRef, audioSourceRef);
+            await initPlayer2(song, audioRef, audioSourceRef);
             if (audioRef.current == null) {
                 throw new Error('Нет элемента аудеоплеера');
             }
@@ -198,55 +216,6 @@ export function SongExplorer(props: Props) {
         }
     };
 
-    const deleteLoop = async (id: number) => {
-        if (deleteActionsLoading.has(id)) {
-            return;
-        }
-
-        try {
-            deleteActionsLoading.add(id);
-            rerender(Math.random);
-
-            await apiCall('/frontend/delete_action', {
-                id: id
-            });
-            song.actions = [...song.actions].filter((action) => {
-                return action.id != id;
-            });
-            if (selectedLoopID == id) {
-                setSelectedLoopID(null);
-            }
-        } finally {
-            deleteActionsLoading.delete(id);
-            rerender(Math.random);
-        }
-    };
-
-    const updateActionName = async (id: number, name: string) => {
-        if (renameActionsLoading.has(id)) {
-            return;
-        }
-
-        try {
-            renameActionsLoading.add(id);
-            rerender(Math.random);
-
-            await apiCall('/frontend/update_action', {
-                id,
-                name
-            });
-
-            for (let i = 0; i < song.actions.length; i++) {
-                if (song.actions[i].id === id) {
-                    song.actions[i].name = name;
-                }
-            }
-        } finally {
-            renameActionsLoading.delete(id);
-            rerender(Math.random);
-        }
-    };
-
     const actionTransformer = (action: SongAction) => {
         const isLoop = action.type === 'loop';
         const isPoint = action.type === 'point';
@@ -266,8 +235,6 @@ export function SongExplorer(props: Props) {
         }
 
         const selected = selectedLoopID == action.id;
-        const deleteLoading = deleteActionsLoading.has(action.id);
-        const renameLoading = renameActionsLoading.has(action.id);
 
         return (
             <div
@@ -309,39 +276,46 @@ export function SongExplorer(props: Props) {
                         className={classNames('item-rename')}
                         onClick={(e) => {
                             e.stopPropagation();
-                            const newName = prompt('Введите новое имя');
-                            if (newName != null && newName.length > 0) {
-                                updateActionName(action.id, newName);
-                            }
+
+                            setModal({ type: 'rename_action', action, song });
+
+                            // const newName = prompt('Введите новое имя');
+                            // if (newName != null && newName.length > 0) {
+                            //     updateActionName(action.id, newName);
+                            // }
                         }}
                     >
-                        {renameLoading ? (
-                            <FontAwesomeIcon className="spinner" icon={faSpinner} />
-                        ) : (
-                            <FontAwesomeIcon icon={faPencil} />
-                        )}
+                        <FontAwesomeIcon icon={faPencil} />
+                        {/* {renameLoading ? (*/}
+                        {/*    <FontAwesomeIcon className="spinner" icon={faSpinner} />*/}
+                        {/* ) : (*/}
+                        {/*    <FontAwesomeIcon icon={faPencil} />*/}
+                        {/* )}*/}
                     </div>
                     <div
-                        className={classNames('item-delete', { loading: deleteLoading })}
+                        className={classNames('item-delete')}
                         onClick={(e) => {
                             e.stopPropagation();
 
-                            if (
-                                confirm(
-                                    `Вы уверены, что хотите удалить действие ${
-                                        action.name ?? moment(action.created_at).format('DD.MM.YYYY HH:mm:ss')
-                                    }`
-                                )
-                            ) {
-                                deleteLoop(action.id);
-                            }
+                            setModal({ type: 'delete_action', action, song });
+
+                            // if (
+                            //     confirm(
+                            //         `Вы уверены, что хотите удалить действие ${
+                            //             action.name ?? moment(action.created_at).format('DD.MM.YYYY HH:mm:ss')
+                            //         }`
+                            //     )
+                            // ) {
+                            //     deleteLoop(action.id);
+                            // }
                         }}
                     >
-                        {deleteLoading ? (
-                            <FontAwesomeIcon className="spinner" icon={faSpinner} />
-                        ) : (
-                            <FontAwesomeIcon icon={faTrashCan} />
-                        )}
+                        <FontAwesomeIcon icon={faTrashCan} />
+                        {/* {deleteLoading ? (*/}
+                        {/*    <FontAwesomeIcon className="spinner" icon={faSpinner} />*/}
+                        {/* ) : (*/}
+                        {/*    <FontAwesomeIcon icon={faTrashCan} />*/}
+                        {/* )}*/}
                     </div>
                 </div>
             </div>
@@ -354,6 +328,25 @@ export function SongExplorer(props: Props) {
                 <div className="song-explorer-player-overlay">
                     <FontAwesomeIcon className="spinner" icon={faSpinner} />
                 </div>
+            ) : null}
+            {modal != null ? (
+                <Modal
+                    {...modal}
+                    close={() => {
+                        setModal(null);
+                        if (modal?.type === 'update_song') {
+                            props.closeSongModal();
+                        }
+                    }}
+                    deleteAction={(songID) => {
+                        song.actions = [...song.actions].filter((action) => {
+                            return action.id != songID;
+                        });
+                        if (selectedLoopID == songID) {
+                            setSelectedLoopID(null);
+                        }
+                    }}
+                />
             ) : null}
             <div className="song-explorer-fixed">
                 <div ref={playerRef} className="song-explorer-player">
@@ -510,4 +503,266 @@ export function SongExplorer(props: Props) {
             </div>
         </div>
     );
+}
+
+interface ModalProps extends modal {
+    close(): void;
+    deleteAction(actionID: number): void;
+}
+function Modal(props: ModalProps) {
+    const { action, song } = props;
+
+    const navigate = useNavigate();
+    const [loading, setLoading] = useState<boolean>(false);
+    const [actionName, setActionName] = useState<string | undefined>(props?.action?.name ?? '');
+    const [name, setName] = useState<string>(song.name);
+    const [performer, setPerformer] = useState<string>(song.performer ?? '');
+    const [deleteConfirmations, setDeleteConfirmations] = useState<number | null>(null);
+    const showNotification = useNotificationStore((state) => state.show);
+    const renameAction = async () => {
+        if (loading) {
+            return;
+        }
+        if (action == null) {
+            throw new Error('action can not be empty');
+        }
+
+        try {
+            setLoading(true);
+
+            const newName = actionName == '' ? undefined : actionName;
+
+            await apiCall('/frontend/update_action', {
+                id: action.id,
+                name: newName
+            });
+
+            action.name = newName;
+        } finally {
+            setLoading(false);
+            props.close();
+        }
+    };
+
+    const deleteAction = async () => {
+        if (loading) {
+            return;
+        }
+        if (action == null || song == null) {
+            throw new Error('action can not be empty');
+        }
+
+        try {
+            setLoading(true);
+
+            await apiCall('/frontend/delete_action', {
+                id: action.id
+            });
+
+            props.deleteAction(action.id);
+        } finally {
+            setLoading(false);
+            props.close();
+        }
+    };
+
+    async function updateSong() {
+        if (loading) {
+            return;
+        }
+
+        if (name.length === 0) {
+            return showNotification('error', 'Название не может быть пустым');
+        }
+
+        try {
+            setLoading(true);
+
+            const newPerformer = performer.length === 0 ? undefined : performer;
+
+            await apiCall('/frontend/update_song', {
+                id: song.id,
+                name: name,
+                performer: newPerformer
+            });
+
+            song.name = name;
+            song.performer = performer;
+        } finally {
+            setLoading(false);
+            props.close();
+        }
+    }
+
+    async function deleteSong() {
+        if (loading) {
+            return;
+        }
+
+        try {
+            setLoading(true);
+
+            await apiCall('/frontend/delete_song', {
+                id: song.id
+            });
+
+            navigate('/songs');
+        } finally {
+            setLoading(false);
+            props.close();
+        }
+    }
+
+    let content = null;
+    if (props.type === 'rename_action') {
+        if (action == null) {
+            throw new Error('action can not be empty');
+        }
+        content = (
+            <form
+                className="song-explorer-modal-rename-action"
+                onSubmit={(e) => {
+                    e.preventDefault();
+                    renameAction();
+                }}
+            >
+                <Input
+                    label="Название"
+                    value={actionName}
+                    onChange={(e) => {
+                        if (loading) return;
+                        setActionName(e.target.value);
+                    }}
+                />
+                <Button submit value="Обновить" loading={loading} />
+                <Button
+                    className="song-explorer-modal-rename-action-close"
+                    onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        props.close();
+                    }}
+                    style="grey"
+                    submit
+                    value={<FontAwesomeIcon icon={faTimes} />}
+                />
+            </form>
+        );
+    } else if (props.type === 'delete_action') {
+        if (action == null) {
+            throw new Error('action can not be empty');
+        }
+
+        let title: string;
+        if (action.name == null) {
+            title = 'Вы уверены, что хотите удалить сохраненное действие?';
+        } else {
+            title = `Вы уверены, что хотите удалить действие ${action.name}?`;
+        }
+
+        content = (
+            <div className="song-explorer-modal-delete-action">
+                <h3>{title}</h3>
+                <div className="song-explorer-modal-delete-action-buttons">
+                    <Button
+                        style="red"
+                        submit
+                        value="Да"
+                        loading={loading}
+                        onClick={() => {
+                            deleteAction();
+                        }}
+                    />
+                    <Button
+                        style="grey"
+                        submit
+                        value="Отмена"
+                        onClick={() => {
+                            props.close();
+                        }}
+                    />
+                </div>
+            </div>
+        );
+    } else if (props.type === 'update_song') {
+        content = (
+            <form
+                className="song-explorer-modal-update-song"
+                onSubmit={(e) => {
+                    e.preventDefault();
+
+                    updateSong();
+                }}
+            >
+                <Input
+                    label="Название"
+                    value={name}
+                    onChange={(e) => {
+                        setName(e.target.value);
+                    }}
+                />
+                <Input
+                    label="Исполнитель"
+                    value={performer}
+                    onChange={(e) => {
+                        setPerformer(e.target.value);
+                    }}
+                />
+                <Button submit value="Обновить" loading={loading} />
+                <Button
+                    className="song-explorer-modal-rename-action-close"
+                    onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        props.close();
+                    }}
+                    style="grey"
+                    submit
+                    value={<FontAwesomeIcon icon={faTimes} />}
+                />
+                {deleteConfirmations == null ? (
+                    <Button
+                        className="delete-song"
+                        style="red"
+                        submit
+                        value={
+                            <span>
+                                <FontAwesomeIcon icon={faTrashCan} />
+                            </span>
+                        }
+                        loading={loading}
+                        onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            setDeleteConfirmations(0);
+                        }}
+                    />
+                ) : (
+                    <Button
+                        className="delete-song"
+                        style="red"
+                        submit
+                        value={
+                            <span>
+                                <FontAwesomeIcon icon={faTrashCan} /> {3 - deleteConfirmations}
+                            </span>
+                        }
+                        loading={loading}
+                        onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+
+                            if (deleteConfirmations >= 2) {
+                                deleteSong();
+                            } else {
+                                setDeleteConfirmations(deleteConfirmations + 1);
+                            }
+                        }}
+                    />
+                )}
+            </form>
+        );
+    }
+
+    return <div className="song-explorer-modal">{content}</div>;
 }

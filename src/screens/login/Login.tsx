@@ -26,7 +26,7 @@ export function Login() {
         }
 
         if (login.length === 0 || password.length === 0) {
-            showNotification('error', `Login and password can not be empty`);
+            showNotification('error', `Пустой логин или пароль`);
             return;
         }
 
@@ -40,7 +40,7 @@ export function Login() {
             navigate(savedUrl);
         } catch (e) {
             if (ApiError.is(e, 'WrongLoginOrPassword')) {
-                showNotification('error', `Wrong username or password`);
+                showNotification('error', `Неправильный логин или пароль`);
             }
         } finally {
             setLoading(false);
@@ -56,7 +56,7 @@ export function Login() {
             }}
         >
             <Input
-                label="Login"
+                label="Логин"
                 icon={faUser}
                 name="login"
                 value={login}
@@ -65,7 +65,7 @@ export function Login() {
                 }}
             />
             <Input
-                label="Password"
+                label="Пароль"
                 icon={faShield}
                 name="password"
                 value={password}
@@ -74,9 +74,9 @@ export function Login() {
                     setPassword(event.target.value);
                 }}
             />
-            <Button className="screen-login-login-button" value="Login" submit loading={loading} />
+            <Button className="screen-login-login-button" value="Логин" submit loading={loading} />
             <Link className="screen-login-sign-up" to="/sign_up">
-                Sign up
+                Регистрация
             </Link>
         </form>
     );

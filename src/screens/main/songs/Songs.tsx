@@ -105,15 +105,6 @@ export function Songs() {
                     }
                 }
 
-                // <div
-                //     className="screen-songs-list-item-settings"
-                //     onClick={() => {
-                //         navigate(`/songs/${song?.id}`);
-                //     }}
-                // >
-                //     <FontAwesomeIcon icon={faGear} />
-                // </div>
-
                 return (
                     <div
                         key={songID}
@@ -132,6 +123,15 @@ export function Songs() {
                             {song.performer == null ? null : (
                                 <div className="screen-songs-list-item-performer">{song.performer}</div>
                             )}
+                            {/* <div*/}
+                            {/*    className="screen-songs-list-item-settings"*/}
+                            {/*    onClick={(e) => {*/}
+                            {/*        e.stopPropagation();*/}
+                            {/*        navigate(`/songs/settings/${song?.id}`);*/}
+                            {/*    }}*/}
+                            {/* >*/}
+                            {/*    <FontAwesomeIcon icon={faGear} />*/}
+                            {/* </div>*/}
                         </div>
                         {i < songListScreen.songs.length - 1 ? <div className="screen-songs-list-item-separator" /> : null}
                     </div>

@@ -145,7 +145,11 @@ export function mountListeners(props: Props): () => void {
             pointerFillElem.style.opacity = '0';
             pointerTimeElem.style.opacity = '0';
             if (latestRation != null) {
-                audioElem.currentTime = audioElem.duration * latestRation;
+                let newCurrentTime = audioElem.duration * latestRation;
+                if (newCurrentTime >= audioElem.duration - 0.1) {
+                    newCurrentTime = audioElem.duration - 0.1;
+                }
+                audioElem.currentTime = newCurrentTime;
             }
         };
 

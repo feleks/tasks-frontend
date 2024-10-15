@@ -32,11 +32,11 @@ export function SignUp() {
             passwordRepeat.length === 0
             // email.length === 0
         ) {
-            showNotification('error', 'All fields must be filled');
+            showNotification('error', 'Все поля должны быть заполнены');
             return;
         }
         if (password !== passwordRepeat) {
-            showNotification('error', 'Passwords do not match');
+            showNotification('error', 'Пароли не совпадают');
             return;
         }
 
@@ -67,9 +67,9 @@ export function SignUp() {
                 signUp();
             }}
         >
-            <div className="screen-sign-up-title">Signing up</div>
+            <div className="screen-sign-up-title">Регистрация</div>
             <Input
-                label="Login"
+                label="Логин"
                 name="login"
                 value={login}
                 onChange={(event) => {
@@ -85,7 +85,7 @@ export function SignUp() {
             {/*    }}*/}
             {/* />*/}
             <Input
-                label="Password"
+                label="Пароль"
                 name="password"
                 password={true}
                 value={password}
@@ -94,7 +94,7 @@ export function SignUp() {
                 }}
             />
             <Input
-                label="Repeat password"
+                label="Повторите пароль"
                 name="password"
                 password={true}
                 value={passwordRepeat}
@@ -111,9 +111,9 @@ export function SignUp() {
             {/*    }}*/}
             {/* />*/}
             <div className="screen-sign-up-buttons">
-                <Button className="screen-sign-up-buttons-sign-up" value="Sign up" submit loading={loading} />
+                <Button className="screen-sign-up-buttons-sign-up" value="Зарегистрироваться" submit loading={loading} />
                 <Link to="/login">
-                    <Button className="screen-sign-up-buttons-back" style="grey" value="Back" />
+                    <Button className="screen-sign-up-buttons-back" style="grey" value="Назад" />
                 </Link>
             </div>
         </form>

@@ -11,21 +11,6 @@ import { useNavigate } from 'react-router-dom';
 import { faChevronLeft } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-function toBase64(file: File): Promise<string> {
-    return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onload = () => {
-            const result = reader.result;
-            if (typeof result !== 'string') {
-                throw new Error(`toBase64 returned non string: ${typeof result}`);
-            }
-            resolve(result);
-        };
-        reader.onerror = reject;
-    });
-}
-
 export function AddSong() {
     const navigate = useNavigate();
     const showNotification = useNotificationStore((state) => state.show);
@@ -134,11 +119,6 @@ export function AddSong() {
                     file={file}
                     onChange={(file) => {
                         setFile(file);
-                        if (file != null) {
-                            (async () => {
-                                console.log(await toBase64(file));
-                            })();
-                        }
                     }}
                 />
                 <Button submit value="Создать" loading={loading} />

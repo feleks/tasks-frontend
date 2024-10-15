@@ -14,7 +14,14 @@
     }
 }
 .screen-view-song-top-panel-back {
-    cursor: pointer;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    position: absolute;
+    left: 20px;
+    top: 12px;
+    bottom: 0;
+    right: 70px;
 
     svg {
         margin-right: 8px;
@@ -25,9 +32,36 @@
             color: $red;
         }
     }
+
+    .screen-view-song-top-panel-back-title {
+        overflow: hidden;
+        white-space: nowrap;
+        word-break: keep-all;
+        text-overflow: ellipsis;
+        cursor: pointer;
+    }
+}
+
+.screen-view-song-top-panel-settings {
+    position: absolute;
+    right: 15px;
+    top: 5px;
+    bottom: 0;
+    width: 40px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    &.in-progress {
+        opacity: 0.15;
+        pointer-events: none;
+    }
 }
 
 .screen-view-song-top-panel {
+    position: relative;
     padding: 12px 20px 0 20px;
 
     display: flex;

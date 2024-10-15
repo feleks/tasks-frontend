@@ -14,7 +14,7 @@
     top: 0;
     bottom: 0;
     right: 0;
-    background-color: #323741;
+    background-color: rgba(#323741, 1);
     z-index: 9999999999;
     color: $blue;
     font-size: 35px;
@@ -22,6 +22,52 @@
     flex-direction: row;
     align-items: center;
     justify-content: center;
+}
+
+.song-explorer-modal {
+    position: absolute;
+    left: -5px;
+    top: -5px;
+    bottom: -5px;
+    right: -5px;
+    background-color: rgba(#323741, 0.93);
+    z-index: 9999999999;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(1px);
+    color: $text-primary-color;
+
+    .song-explorer-modal-rename-action {
+        width: 70%;
+    }
+    .song-explorer-modal-rename-action-close {
+        float: right;
+        width: 60px;
+    }
+    .song-explorer-modal-delete-action {
+        width: 70%;
+        text-align: center;
+
+        .song-explorer-modal-delete-action-buttons {
+            text-align: center;
+
+            button {
+                width: 100px;
+                margin: 0 5px;
+            }
+        }
+    }
+    .song-explorer-modal-update-song {
+        width: 80%;
+
+        .delete-song {
+            float: right;
+            margin-right: 5px;
+            width: 60px;
+        }
+    }
 }
 
 .song-explorer-scroll {
