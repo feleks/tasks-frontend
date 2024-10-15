@@ -112,19 +112,40 @@
     align-items: center;
 
     height: 275px;
+
+    .segment-error-icon {
+        color: $red;
+        font-size: 30px;
+    }
+
+    .segment-error-text {
+        margin-top: 20px;
+
+        color: white;
+    }
+
+    .segment-error-reload {
+        margin-top: 20px;
+    }
 }
 
-.segment-error-icon {
-    color: $red;
-    font-size: 30px;
-}
+.segment-loading {
+    height: 400px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: $blue;
+    font-size: 35px;
 
-.segment-error-text {
-    margin-top: 20px;
-
-    color: white;
-}
-
-.segment-error-reload {
-    margin-top: 20px;
+    &.segment-loading-overlay {
+        height: unset;
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        right: 0;
+        background-color: rgba(#323741, 1);
+        z-index: 9999999999;
+    }
 }

@@ -8,7 +8,6 @@ import {
     faPencil,
     faPlay,
     faRecycle,
-    faSpinner,
     faStop,
     faTimes,
     faTrashCan
@@ -23,6 +22,7 @@ import { initPlayer2 } from './initPlayer';
 import { Input } from '../../../../../components/input/Input';
 import { useNotificationStore } from '../../../../../stores/notification';
 import { useNavigate } from 'react-router-dom';
+import { SegmentLoading } from '../../../../../components/segment-loading/SegmentLoading';
 
 interface Props {
     song: SongDetailed;
@@ -324,11 +324,7 @@ export function SongExplorer(props: Props) {
 
     return (
         <div className="song-explorer">
-            {duration === 0 ? (
-                <div className="song-explorer-player-overlay">
-                    <FontAwesomeIcon className="spinner" icon={faSpinner} />
-                </div>
-            ) : null}
+            {duration === 0 ? <SegmentLoading overlay={true} /> : null}
             {modal != null ? (
                 <Modal
                     {...modal}

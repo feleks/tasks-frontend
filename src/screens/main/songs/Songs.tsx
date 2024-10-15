@@ -1,27 +1,47 @@
-import React, { useLayoutEffect } from 'react';
+import React, { useLayoutEffect, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faExclamation, faList, faPlus, faRotateRight, faSearch } from '@fortawesome/free-solid-svg-icons';
+import { faList, faPlus, faSearch } from '@fortawesome/free-solid-svg-icons';
 import { Button } from '../../../components/button/Button';
 import './Songs.scss';
-import { listSongs, useSongStore } from '../../../stores/songs';
 import classNames from 'classnames';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Input } from '../../../components/input/Input';
+import { PayloadScreenState } from '../../../stores/screen';
+import { SongBrief } from '../../../api/entities';
+import { apiCall } from '../../../api/api_call';
+import { SegmentError } from '../../../components/segment-error/SegmentError';
 
 export function Songs() {
     const navigate = useNavigate();
-    const songListScreen = useSongStore((state) => state.songListScreen);
-    const songBriefStorage = useSongStore((state) => state.songBriefStorage);
-    const setSearchString = useSongStore((state) => state.songsListScreenSetSearchString);
     const { id: selectedSongIDRaw } = useParams<{ id: string }>();
+    const selectedSongID = parseInt(selectedSongIDRaw ?? '-1', 10);
+    const [screenState, setScreenState] = useState<PayloadScreenState<SongBrief[]>>({ status: 'loading' });
+    const [searchString, setSearchString] = useState('');
+
+    async function listSongs() {
+        try {
+            setScreenState({ status: 'loading' });
+
+            const songs = await apiCall('/frontend/list_songs', null);
+            setScreenState({
+                status: 'ok',
+                payload: songs.songs
+            });
+        } catch (e) {
+            setScreenState({
+                status: 'error',
+                error: `Не удалось запросить список песен`
+            });
+        }
+    }
 
     useLayoutEffect(() => {
-        listSongs(true);
+        listSongs();
     }, []);
 
     let content: any = null;
 
-    if (songListScreen.state.status === 'loading') {
+    if (screenState.status === 'loading') {
         content = (
             <div className="screen-songs-list-loading">
                 <div className="screen-songs-list-loading-item loading-item" />
@@ -31,28 +51,9 @@ export function Songs() {
                 <div className="screen-songs-list-loading-item loading-item" />
             </div>
         );
-    } else if (songListScreen.state.status === 'error') {
-        content = (
-            <div className="screen-songs-list-error">
-                <FontAwesomeIcon icon={faExclamation} className="screen-songs-list-error-icon" />
-                <div className="screen-songs-list-error-text">
-                    Не удалось запросить список песен: {songListScreen.state.error}
-                </div>
-                <Button
-                    className="screen-songs-list-error-reload"
-                    value={
-                        <span>
-                            <FontAwesomeIcon icon={faRotateRight} /> Перезагрузить
-                        </span>
-                    }
-                    style="grey"
-                    onClick={() => {
-                        listSongs(true);
-                    }}
-                />
-            </div>
-        );
-    } else if (songListScreen.songs.length === 0) {
+    } else if (screenState.status === 'error') {
+        content = <SegmentError screenState={screenState} reload={listSongs} />;
+    } else if (screenState.payload == null || screenState.payload.length === 0) {
         content = (
             <div className="screen-songs-list-empty">
                 <FontAwesomeIcon icon={faList} className="screen-songs-list-empty-icon" />
@@ -60,27 +61,23 @@ export function Songs() {
             </div>
         );
     } else {
-        let filteredSongs = songListScreen.songs;
-        let searchString = songListScreen.searchString;
+        let filteredSongs = screenState.payload;
 
         if (searchString.length > 0) {
-            searchString = searchString.toLowerCase();
+            const searchStringNorm = searchString.toLowerCase();
 
-            filteredSongs = songListScreen.songs.filter((songID) => {
-                const song = songBriefStorage.get(songID);
-                if (song == null) {
-                    throw new Error('Song can not by null at this point');
-                }
-
+            filteredSongs = screenState.payload.filter((song) => {
                 const name = song.name.toLowerCase();
-                if (name.includes(searchString)) {
+                if (name.includes(searchStringNorm)) {
                     return true;
                 }
 
                 const performer = song.performer == null ? null : song.performer.toLowerCase();
-                if (performer != null && performer.includes(searchString)) {
+                if (performer != null && performer.includes(searchStringNorm)) {
                     return true;
                 }
+
+                return false;
             });
         }
 
@@ -92,22 +89,12 @@ export function Songs() {
                 </div>
             );
         } else {
-            content = filteredSongs.map((songID, i) => {
-                const song = songBriefStorage.get(songID);
-                if (song == null) {
-                    throw new Error('Song can not by null at this point');
-                }
-
-                let selected = false;
-                if (selectedSongIDRaw != null) {
-                    if (parseInt(selectedSongIDRaw) === songID) {
-                        selected = true;
-                    }
-                }
+            content = filteredSongs.map((song, i) => {
+                const selected = selectedSongID === song.id;
 
                 return (
                     <div
-                        key={songID}
+                        key={song.id}
                         className="screen-songs-list-item-wrapper"
                         onClick={() => {
                             navigate(`/songs/${song?.id}`);
@@ -133,7 +120,7 @@ export function Songs() {
                             {/*    <FontAwesomeIcon icon={faGear} />*/}
                             {/* </div>*/}
                         </div>
-                        {i < songListScreen.songs.length - 1 ? <div className="screen-songs-list-item-separator" /> : null}
+                        {i < filteredSongs.length - 1 ? <div className="screen-songs-list-item-separator" /> : null}
                     </div>
                 );
             });
@@ -147,7 +134,7 @@ export function Songs() {
                     icon={faSearch}
                     className="screen-songs-search-input"
                     label="Поиск"
-                    value={songListScreen.searchString}
+                    value={searchString}
                     onChange={(e) => {
                         setSearchString(e.target.value);
                     }}

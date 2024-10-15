@@ -6,7 +6,6 @@ import { InputFile } from '../../../../components/input-file/InputFile';
 import { useNotificationStore } from '../../../../stores/notification';
 import { apiCall } from '../../../../api/api_call';
 import { SongBrief, SongFormat } from '../../../../api/entities';
-import { listSongs } from '../../../../stores/songs';
 import { useNavigate } from 'react-router-dom';
 import { faChevronLeft } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -64,8 +63,6 @@ export function AddSong() {
             showNotification('success', `Песня ${song.name} успешно загружена`);
 
             navigate('/songs');
-
-            listSongs(true);
         };
 
         if (loading) {
