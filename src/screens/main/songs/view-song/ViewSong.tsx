@@ -42,7 +42,7 @@ export function ViewSong() {
 
     let content: any;
     if (screenState.status === 'loading') {
-        content = <SegmentLoading />;
+        content = <SegmentLoading text="Загрузка информации о аудиофайле" />;
     } else if (screenState.status === 'error') {
         content = <SegmentError screenState={screenState} reload={getSong} />;
     } else {

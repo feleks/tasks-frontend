@@ -1,0 +1,115 @@
+@import 'src/style/variables';
+
+.audio-progress-bar {
+    position: relative;
+
+    * {
+        pointer-events: none;
+    }
+
+    audio {
+        display: none;
+    }
+
+    .audio-progress-bar-container {
+        position: relative;
+        border-radius: 5px;
+        overflow: hidden;
+    }
+
+    .audio-progress-bar-duration {
+        position: absolute;
+        right: 0;
+        top: 100%;
+        padding-top: 3px;
+        color: $text-primary-color;
+        font-size: 14px;
+        opacity: 0.5;
+
+        &.end {
+            right: 0;
+        }
+        &.start {
+            left: 0;
+        }
+    }
+
+    .audio-progress-bar-border {
+        height: 60px;
+        border: 1px solid #6b707a;
+        border-radius: 5px;
+        pointer-events: all !important;
+    }
+
+    .audio-progress-bar-current-fill {
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 0;
+        overflow: hidden;
+        background-color: $blue;
+    }
+    .audio-progress-bar-current-time {
+        position: absolute;
+        bottom: 5px;
+        left: 33%;
+
+        //line-height: 40px;
+        font-size: 18px;
+        color: $text-primary-color;
+
+        transition: transform 0.1s ease;
+
+        &.left {
+            transform: translate(-105%, 0);
+        }
+    }
+
+    .audio-progress-bar-point {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        margin-left: -1px;
+        background-color: $green;
+    }
+
+    .audio-progress-bar-pointer-fill {
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 0;
+        overflow: hidden;
+        opacity: 0;
+        transition: opacity;
+        height: 60px;
+        background-color: $text-primary-color;
+    }
+    .audio-progress-bar-pointer-time {
+        position: absolute;
+        top: 10px;
+        left: 0;
+
+        font-size: 18px;
+        color: $text-primary-color;
+        opacity: 0;
+
+        transition: transform 0.1s ease, opacity 0.5s ease;
+
+        &.left {
+            transform: translate(-105%, 0);
+        }
+    }
+    .audio-progress-bar-loop-fill {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 0;
+        overflow: hidden;
+        transition: opacity;
+        height: 10px;
+        background-color: $yellow;
+    }
+}

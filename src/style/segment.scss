@@ -148,4 +148,16 @@
         background-color: rgba(#323741, 1);
         z-index: 9999999999;
     }
+
+    .segment-loading-text {
+        position: absolute;
+        left: 20px;
+        bottom: 0;
+        right: 20px;
+        top: calc(50% + 40px);
+        color: $text-primary-color;
+        text-align: center;
+        font-size: 20px;
+        margin-top: 10px;
+    }
 }
