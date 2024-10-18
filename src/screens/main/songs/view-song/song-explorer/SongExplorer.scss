@@ -9,6 +9,13 @@
     audio {
         display: none;
     }
+    &.player-stalled {
+        pointer-events: none !important;
+    }
+}
+
+.song-explorer-fixed {
+    padding-bottom: 15px;
 }
 
 .song-explorer-player-overlay {
@@ -37,10 +44,14 @@
     z-index: 9999999999;
     display: flex;
     flex-direction: row;
-    align-items: center;
+    align-items: flex-start;
     justify-content: center;
     backdrop-filter: blur(1px);
     color: $text-primary-color;
+
+    > * {
+        margin-top: 20px;
+    }
 
     .song-explorer-modal-rename-action {
         width: 70%;
@@ -78,120 +89,6 @@
     max-height: calc(100vh - 470px);
 }
 
-.song-explorer-player {
-    position: relative;
-
-    * {
-        pointer-events: none;
-    }
-
-    audio {
-        display: none;
-    }
-
-    .song-explorer-player-container {
-        position: relative;
-        border-radius: 5px;
-        overflow: hidden;
-    }
-
-    .song-explorer-player-duration {
-        position: absolute;
-        right: 0;
-        top: 100%;
-        padding-top: 3px;
-        color: $text-primary-color;
-        font-size: 14px;
-        opacity: 0.5;
-
-        &.end {
-            right: 0;
-        }
-        &.start {
-            left: 0;
-        }
-    }
-
-    .song-explorer-player-border {
-        height: 60px;
-        border: 1px solid #6b707a;
-        border-radius: 5px;
-        pointer-events: all !important;
-    }
-
-    .song-explorer-player-current-fill {
-        position: absolute;
-        left: 0;
-        top: 0;
-        bottom: 0;
-        width: 0;
-        overflow: hidden;
-        background-color: $blue;
-    }
-    .song-explorer-player-current-time {
-        position: absolute;
-        bottom: 5px;
-        left: 33%;
-
-        //line-height: 40px;
-        font-size: 18px;
-        color: $text-primary-color;
-
-        transition: transform 0.1s ease;
-
-        &.left {
-            transform: translate(-105%, 0);
-        }
-    }
-
-    .song-explorer-player-point {
-        position: absolute;
-        top: 0;
-        bottom: 0;
-        width: 2px;
-        margin-left: -1px;
-        background-color: $green;
-    }
-
-    .song-explorer-player-pointer-fill {
-        position: absolute;
-        left: 0;
-        top: 0;
-        bottom: 0;
-        width: 0;
-        overflow: hidden;
-        opacity: 0;
-        transition: opacity;
-        height: 60px;
-        background-color: $text-primary-color;
-    }
-    .song-explorer-player-pointer-time {
-        position: absolute;
-        top: 10px;
-        left: 0;
-
-        font-size: 18px;
-        color: $text-primary-color;
-        opacity: 0;
-
-        transition: transform 0.1s ease, opacity 0.5s ease;
-
-        &.left {
-            transform: translate(-105%, 0);
-        }
-    }
-    .song-explorer-player-loop-fill {
-        position: absolute;
-        left: 0;
-        top: 0;
-        width: 0;
-        overflow: hidden;
-        transition: opacity;
-        height: 10px;
-        background-color: $yellow;
-    }
-}
-
 .song-explorer-controls {
     position: relative;
     margin: 15px 0;
@@ -201,7 +98,43 @@
     justify-content: center;
 }
 
-.song-explorer-player-controls-play {
+.song-explorer-controls-playbutton {
+    position: relative;
+
+    .song-explorer-controls-playbutton-overlay {
+        border-radius: 5px;
+        position: absolute;
+        left: 7px;
+        top: 7px;
+        bottom: 7px;
+        right: 7px;
+        background-color: #323741;
+        opacity: 0;
+        transition: opacity 0.5s ease;
+        color: $blue;
+        font-size: 23px;
+        pointer-events: none;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+
+        svg {
+            position: relative;
+        }
+        &.show {
+            opacity: 1;
+        }
+    }
+}
+
+.song-explorer-controls-split {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+}
+
+.song-explorer-controls-play {
     width: 60px;
 
     &.pause {
@@ -212,7 +145,7 @@
     }
 }
 
-.song-explorer-player-controls-loop {
+.song-explorer-controls-loop {
     position: absolute;
     top: 50%;
     left: 50%;
@@ -323,7 +256,6 @@
 .song-explorer-actions-history {
 }
 .song-explorer-actions-history-title {
-    margin-top: 10px;
     color: $text-primary-color;
     text-align: center;
     opacity: 0.5;
@@ -411,4 +343,11 @@
         align-items: center;
         justify-content: center;
     }
+}
+
+.song-explorer-volume {
+    overflow: hidden;
+    padding: 0;
+    margin: 0;
+    border: none;
 }

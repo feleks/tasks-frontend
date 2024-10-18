@@ -23,22 +23,22 @@ interface InitPlayer1CacheItem {
 }
 const initPlayer1Cache = new Map<SongID, InitPlayer1CacheItem>();
 
-setInterval(() => {
-    const itemsToDelete: SongID[] = [];
-
-    initPlayer1Cache.forEach((item, songID) => {
-        const timeElapsed = Date.now() - item.createdAt;
-
-        if (timeElapsed > 15000) {
-            itemsToDelete.push(songID);
-        }
-    });
-
-    for (const songID of itemsToDelete) {
-        console.log(`deleted ${songID} from cache`);
-        initPlayer1Cache.delete(songID);
-    }
-}, 1000);
+// setInterval(() => {
+//     const itemsToDelete: SongID[] = [];
+//
+//     initPlayer1Cache.forEach((item, songID) => {
+//         const timeElapsed = Date.now() - item.createdAt;
+//
+//         if (timeElapsed > 15000) {
+//             itemsToDelete.push(songID);
+//         }
+//     });
+//
+//     for (const songID of itemsToDelete) {
+//         console.log(`deleted ${songID} from cache`);
+//         initPlayer1Cache.delete(songID);
+//     }
+// }, 1000);
 export async function initPlayer(
     song: SongBrief,
     audioRef: RefObject<HTMLAudioElement>,
@@ -51,7 +51,7 @@ export async function initPlayer(
         throw new Error('audioElem or audioSourceElem is null');
     }
 
-    let audioInfo = null; // initPlayer1Cache.get(song.id);
+    let audioInfo = initPlayer1Cache.get(song.id);
     if (audioInfo == null) {
         const res = await fetch(`/frontend/download_song/${song.id}`);
 
@@ -71,14 +71,14 @@ export async function initPlayer(
             createdAt: Date.now()
         };
 
-        initPlayer1Cache.set(song.id, audioInfo);
+        // initPlayer1Cache.set(song.id, audioInfo);
     }
 
     audioSourceElem.setAttribute('src', audioInfo.blobOU);
     audioSourceElem.setAttribute('type', audioInfo.contentType);
 
     audioElem.load();
-    audioElem.volume = 0.4;
+    audioElem.volume = 0.3;
 
     await waitForAudio(audioElem);
 }
@@ -97,7 +97,7 @@ export async function initPlayer2(
     audioSourceElem.setAttribute('src', `/frontend/download_song/${song.id}`);
 
     audioElem.load();
-    audioElem.volume = 0.4;
+    audioElem.volume = 0.3;
 
     await waitForAudio(audioElem);
 }

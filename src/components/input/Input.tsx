@@ -15,10 +15,11 @@ interface Props {
     onChange?: ChangeEventHandler<HTMLInputElement>;
     onBlur?: FocusEventHandler<HTMLInputElement>;
     small?: boolean;
+    inputRef?: React.RefObject<HTMLInputElement>;
 }
 
 export function Input(props: Props) {
-    const { onBlur, small, icon, label, value, name, password = false, onChange, className } = props;
+    const { inputRef, onBlur, small, icon, label, value, name, password = false, onChange, className } = props;
 
     const [showPassword, setShowPassword] = useState(false);
 
@@ -60,6 +61,7 @@ export function Input(props: Props) {
             {iconElement}
             {passwordIconElement}
             <input
+                ref={inputRef}
                 className={inputClassNames}
                 type={inputType}
                 value={value}

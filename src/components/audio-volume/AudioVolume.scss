@@ -1,0 +1,113 @@
+@import 'src/style/variables';
+
+.audio-volume {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    margin-bottom: 5px;
+    user-select: none;
+
+    &:last-of-type {
+        margin-bottom: 20px;
+    }
+}
+.audio-volume-subtrack {
+    height: 30px;
+    display: flex;
+    flex-direction: row;
+    //align-items: stretch;
+    justify-content: stretch;
+}
+.audio-volume-subtrack-check {
+    border-radius: 10px;
+    width: 30px;
+    border: 1px solid #6b707a;
+    margin-right: 5px;
+    line-height: 30px;
+    text-align: center;
+    font-size: 15px;
+    cursor: pointer;
+    transition: background-color 0.5s ease;
+    color: #6b707a;
+
+    &.check-selected {
+        background-color: $blue;
+        border: 1px solid darken($blue, 1);
+        color: $text-primary-color;
+    }
+}
+.audio-volume-subtrack-name {
+    margin-right: 5px;
+    line-height: 28px;
+    font-size: 14px;
+    cursor: pointer;
+    border: 1px solid #6b707a;
+    background-color: darken(#6b707a, 15);
+    border-radius: 10px;
+    width: 100px;
+    text-align: center;
+    font-weight: bold;
+
+    &.check-unselected {
+        color: #6b707a !important;
+    }
+}
+.audio-volume-subtrack-slider {
+    position: relative;
+    border-radius: 5px;
+    overflow: hidden;
+    flex: 1;
+
+    * {
+        pointer-events: none;
+    }
+}
+.audio-volume-subtrack-slider-border {
+    height: 30px;
+    border: 1px solid #6b707a;
+    border-radius: 5px;
+    pointer-events: all !important;
+}
+.audio-volume-subtrack-slider-current-fill {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 0;
+}
+.audio-volume-subtrack-slider-current-text {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    color: $text-primary-color;
+    font-size: 17px;
+    text-shadow: rgba(0, 0, 0, 1) 0 0 2px;
+    transition: left 0.25s ease, transform 0.25s ease;
+    white-space: nowrap;
+    word-break: keep-all;
+
+    .audio-volume-subtrack-slider-current-text-icon {
+        font-size: 14px;
+        margin-right: 3px;
+    }
+}
+.audio-volume-subtrack-slider-pointer-fill {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 33%;
+    background-color: $text-primary-color;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+}
+.audio-volume-subtrack-slider-pointer-text {
+    position: absolute;
+    left: 33%;
+    top: 0;
+    color: $text-primary-color;
+    font-size: 13px;
+    text-shadow: rgba(0, 0, 0, 1) 0 0 2px;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+}

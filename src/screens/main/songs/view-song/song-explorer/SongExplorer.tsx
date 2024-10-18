@@ -1,29 +1,31 @@
-import React, { RefObject, useEffect, useRef, useState } from 'react';
+import React, { createRef, RefObject, useEffect, useRef, useState } from 'react';
 import './SongExplorer.scss';
 import { SongAction, SongDetailed } from '../../../../../api/entities';
 import { Button } from '../../../../../components/button/Button';
 import {
+    faCodeFork,
     faLocationDot,
     faPause,
     faPencil,
     faPlay,
     faRecycle,
+    faSpinner,
     faStop,
     faTimes,
     faTrashCan
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import classNames from 'classnames';
-import { mountListeners } from './mountListeners';
 import { ArrayElement, Loop, secondsToStr } from './utils';
 import { apiCall } from '../../../../../api/api_call';
 import moment from 'moment';
 import { SegmentLoading } from '../../../../../components/segment-loading/SegmentLoading';
 import { AudioProgressBar } from '../../../../../components/audio-progress-bar/AudioProgressBar';
-import { initPlayer } from './initPlayer';
 import { useNavigate } from 'react-router-dom';
 import { useNotificationStore } from '../../../../../stores/notification';
 import { Input } from '../../../../../components/input/Input';
+import { AudioVolume } from '../../../../../components/audio-volume/AudioVolume';
+import { initPlayer2 } from './initPlayer';
 
 interface Props {
     song: SongDetailed;
@@ -38,6 +40,32 @@ export interface modal {
     action?: SongAction;
 }
 const speedOptions = [80, 85, 90, 95, 100];
+interface State {
+    modal: modal | null;
+
+    mainVolume: number;
+    selectedSpeed: number;
+    loopStart: number | null;
+    isPlaying: boolean;
+    duration: number;
+    currentTime: number;
+    selectedLoopID: number | null;
+    playerStalled: boolean;
+
+    scrollOffset: number;
+
+    test_ShowSubTracks: boolean;
+    test_SubTracksVolumes: number[];
+
+    loadingText: string;
+    createLoopLoading: boolean;
+    createPointLoading: boolean;
+}
+
+interface AudioRef {
+    audio: React.RefObject<HTMLAudioElement>;
+    source: React.RefObject<HTMLSourceElement>;
+}
 
 const splitOptions = ['drums', 'bass', 'piano', 'vocals', 'other'] as const;
 type SplitOption = ArrayElement<typeof splitOptions>;
@@ -48,111 +76,413 @@ type SplitRefs = {
         source: RefObject<HTMLSourceElement>;
     };
 };
-export function SongExplorer(props: Props) {
-    console.log('SongExplorerRender', Math.floor(new Date().valueOf() / 10) % 10000);
 
-    const { song, setError } = props;
+interface Ref {
+    fixed: RefObject<HTMLDivElement>;
+    scroll: RefObject<HTMLDivElement>;
 
-    const [loadingText, setLoadingText] = useState('Загрузка аудиофайла');
-    const [selectedSpeed, setSelectedSpeed] = useState(100);
-    const [loopStart, setLoopStart] = useState<number | null>(null);
-    const [isPlaying, setIsPlaying] = useState(false);
-    const [duration, setDuration] = useState<number>(0);
-    const [currentTime, setCurrentTime] = useState<number>(0);
-    const [selectedLoopID, setSelectedLoopID] = useState<number | null>(null);
-    const [createLoopLoading, setCreateLoopLoading] = useState(false);
-    const [createPointLoading, setCreatePointLoading] = useState(false);
-    // const [temporaryLoop, setTemporaryLoop] = useState<[number, number] | null>(null);
-    const [modal, setModal] = useState<modal | null>(null);
+    main: AudioRef;
+    split: SplitRefs;
+}
 
-    const audioRef = useRef<HTMLAudioElement>(null);
-    const audioSourceRef = useRef<HTMLSourceElement>(null);
-    const splitRefs: SplitRefs = (() => {
-        const res: SplitRefs = {} as any;
-        for (const opt of splitOptions) {
-            res[opt] = {
-                audio: useRef<HTMLAudioElement>(null),
-                source: useRef<HTMLSourceElement>(null)
-            };
-        }
-        return res;
-    })();
+type Unmounter = () => void;
 
-    let selectedLoop: SongAction | null = null;
-    if (selectedLoopID != null) {
-        for (const action of song.actions) {
-            if (action.id == selectedLoopID) {
-                selectedLoop = action;
-                break;
-            }
+export class SongExplorer extends React.Component<Props, State> {
+    private readonly ref: Ref;
+    private unmounters: Unmounter[] = [];
+    constructor(props: Props) {
+        super(props);
+
+        this.state = {
+            modal: null,
+            loadingText: 'Загрузка аудиофайла',
+            selectedSpeed: 100,
+            loopStart: null,
+            isPlaying: false,
+            duration: 0,
+            currentTime: 0,
+            test_ShowSubTracks: false,
+            test_SubTracksVolumes: [0.33, 0.22, 0.15, 0.17, 0.27],
+            selectedLoopID: null,
+            createLoopLoading: false,
+            createPointLoading: false,
+            playerStalled: false,
+            scrollOffset: 0,
+            mainVolume: 0.3
+        };
+
+        this.ref = {
+            fixed: createRef(),
+            scroll: createRef(),
+
+            main: {
+                audio: createRef(),
+                source: createRef()
+            },
+            split: (() => {
+                const res: SplitRefs = {} as any;
+                for (const opt of splitOptions) {
+                    res[opt] = {
+                        audio: createRef<HTMLAudioElement>(),
+                        source: createRef<HTMLSourceElement>()
+                    };
+                }
+                return res;
+            })()
+        };
+    }
+
+    componentDidMount() {
+        this.localInitPlayer();
+        this.unmounters.push(this.mountListeners());
+
+        this.updateScrollHeight();
+        const id = setInterval(this.updateScrollHeight, 5000);
+
+        this.unmounters.push(() => clearInterval(id));
+    }
+
+    componentWillUnmount() {
+        for (const unmounter of this.unmounters) {
+            unmounter();
         }
     }
 
-    let loop: Loop | null = null;
-    if (selectedLoop != null && selectedLoop.loop != null) {
-        loop = Loop.fromSegment(selectedLoop.loop);
+    render() {
+        // console.log('SongExplorerRender', Math.floor(new Date().valueOf() / 10) % 10000);
+
+        const { song, songModal, closeSongModal } = this.props;
+        const {
+            modal,
+            loadingText,
+            selectedSpeed,
+            loopStart,
+            isPlaying,
+            duration,
+            currentTime,
+            selectedLoopID,
+            createLoopLoading,
+            createPointLoading,
+            playerStalled
+        } = this.state;
+
+        let modalParams: modal | null = songModal ? { type: 'update_song', song } : modal;
+        if (playerStalled) {
+            modalParams = null;
+        }
+        const selectedLoop = this.getSelectedLoop();
+
+        return (
+            <div className={classNames('song-explorer', { 'player-stalled': playerStalled })}>
+                {duration === 0 ? <SegmentLoading text={loadingText} overlay={true} /> : null}
+                {modalParams != null ? (
+                    <Modal
+                        {...modalParams}
+                        close={() => {
+                            this.setState({ modal: null });
+                            if (modalParams != null && modalParams.type === 'update_song') {
+                                closeSongModal();
+                            }
+                        }}
+                        deleteAction={(songID) => {
+                            song.actions = [...song.actions].filter((action) => {
+                                return action.id != songID;
+                            });
+                            if (selectedLoopID == songID) {
+                                this.setState({ selectedLoopID: null });
+                            }
+                        }}
+                    />
+                ) : null}
+                <div className="song-explorer-fixed" ref={this.ref.fixed}>
+                    <audio ref={this.ref.main.audio} controls>
+                        <source ref={this.ref.main.source} />
+                    </audio>
+                    {splitOptions.map((splitOption) => {
+                        return (
+                            <audio key={splitOption} ref={this.ref.split[splitOption].audio} controls>
+                                <source ref={this.ref.split[splitOption].source} />
+                            </audio>
+                        );
+                    })}
+
+                    <AudioProgressBar
+                        duration={duration}
+                        currentTime={currentTime}
+                        points={this.getPoints()}
+                        loop={selectedLoop?.loop}
+                        loopStart={loopStart}
+                        onSeek={(time) => {
+                            this.audio().currentTime = time;
+                        }}
+                        stalled={playerStalled}
+                    />
+
+                    <div className="song-explorer-controls">
+                        <Button
+                            className="song-explorer-controls-split"
+                            value={
+                                <span>
+                                    <FontAwesomeIcon icon={faCodeFork} />
+                                </span>
+                            }
+                            style={this.state.test_ShowSubTracks ? 'blue' : 'grey'}
+                            small
+                            onClick={() => {
+                                this.setState({ test_ShowSubTracks: !this.state.test_ShowSubTracks }, this.updateScrollHeight);
+                            }}
+                        />
+                        <div className="song-explorer-controls-playbutton">
+                            {(() => {
+                                let icon = null;
+                                if (isPlaying) {
+                                    icon = <FontAwesomeIcon icon={faPause} />;
+                                } else {
+                                    icon = <FontAwesomeIcon icon={faPlay} />;
+                                }
+
+                                return (
+                                    <>
+                                        <Button
+                                            className={classNames('song-explorer-controls-play', {
+                                                pause: isPlaying,
+                                                resume: !isPlaying
+                                            })}
+                                            value={icon}
+                                            style="grey"
+                                            onClick={this.togglePlay}
+                                        />
+                                        <div
+                                            className={classNames('song-explorer-controls-playbutton-overlay', {
+                                                show: playerStalled
+                                            })}
+                                        >
+                                            <FontAwesomeIcon className="spinner" icon={faSpinner} />
+                                        </div>
+                                    </>
+                                );
+                            })()}
+                        </div>
+                        {selectedLoop != null ? (
+                            <div className="song-explorer-controls-loop">
+                                <div className="loop-segment">
+                                    <span className="loop-segment-val">{secondsToStr(selectedLoop.loop.left)}</span>
+                                    <span className="loop-segment-sep">-</span>
+                                    <span className="loop-segment-val">{secondsToStr(selectedLoop.loop.right)}</span>
+                                </div>
+                                <div
+                                    className="stop-loop"
+                                    onClick={() => {
+                                        this.setState({ selectedLoopID: null });
+                                    }}
+                                >
+                                    <FontAwesomeIcon icon={faTimes} />
+                                </div>
+                            </div>
+                        ) : null}
+                    </div>
+                    <div className="song-explorer-volume">
+                        {!this.state.test_ShowSubTracks ? (
+                            <AudioVolume
+                                volume={this.state.mainVolume}
+                                onVolumeUpdate={(volume) => {
+                                    this.audio().volume = volume;
+                                }}
+                            />
+                        ) : (
+                            ['Ударные', 'Бас', 'Клавишные', 'Вокал', 'Остальное'].map((name, i) => {
+                                return (
+                                    <AudioVolume
+                                        key={name}
+                                        subTrack={{
+                                            index: i,
+                                            name: name
+                                        }}
+                                        volume={this.state.test_SubTracksVolumes[i]}
+                                        onVolumeUpdate={(volume) => {
+                                            const newVolumes = [...this.state.test_SubTracksVolumes];
+                                            newVolumes[i] = volume;
+
+                                            this.setState({ test_SubTracksVolumes: newVolumes });
+                                            this.audio().volume = volume;
+                                        }}
+                                    />
+                                );
+                            })
+                        )}
+                    </div>
+                    <div className="song-explorer-speed">
+                        {speedOptions.map((speed) => {
+                            const selected = speed === selectedSpeed;
+                            return (
+                                <div
+                                    key={speed}
+                                    className={classNames('song-explorer-speed-item component-button small', {
+                                        'style-grey': !selected,
+                                        'style-blue': selected
+                                    })}
+                                    onClick={() => {
+                                        if (speed != selectedSpeed) {
+                                            this.setState({ selectedSpeed: speed });
+                                            this.audio().playbackRate = speed / 100;
+                                        }
+                                    }}
+                                >
+                                    {speed}%
+                                </div>
+                            );
+                        })}
+                    </div>
+                    <div className="song-explorer-actions">
+                        <Button
+                            className="song-explorer-actions-point"
+                            loading={createPointLoading}
+                            value={
+                                <span>
+                                    <FontAwesomeIcon icon={faLocationDot} />
+                                    Добавить точку
+                                </span>
+                            }
+                            onClick={this.createPoint}
+                            style="green"
+                            small
+                        />
+                        {loopStart == null ? (
+                            <Button
+                                className="song-explorer-actions-loop"
+                                loading={createLoopLoading}
+                                value={
+                                    <span>
+                                        <FontAwesomeIcon icon={faRecycle} />
+                                        Начать цикл
+                                    </span>
+                                }
+                                onClick={() => {
+                                    if (duration == null) {
+                                        return;
+                                    }
+                                    this.setState({ selectedLoopID: null, loopStart: this.audio().currentTime });
+                                }}
+                                style="yellow"
+                                small
+                            />
+                        ) : (
+                            <Button
+                                className="song-explorer-actions-loop"
+                                loading={createLoopLoading}
+                                value={
+                                    <>
+                                        <span>
+                                            <FontAwesomeIcon icon={faStop} /> {secondsToStr(currentTime - loopStart)} Завершить
+                                        </span>
+                                        {/* <div className="song-explorer-actions-loop-time">01:05</div>*/}
+                                    </>
+                                }
+                                onClick={this.createLoop}
+                                style="yellow"
+                                small
+                            />
+                        )}
+                    </div>
+                </div>
+                <div
+                    className="song-explorer-scroll"
+                    ref={this.ref.scroll}
+                    style={{ maxHeight: `calc(100vh - ${this.state.scrollOffset}px)` }}
+                >
+                    <div className="song-explorer-actions-history">
+                        <div className="song-explorer-actions-history-title">Сохраненные действия</div>
+                        <div className="song-explorer-actions-history-container">
+                            {song.actions.map((action) => {
+                                return (
+                                    <Action
+                                        key={action.id}
+                                        song={song}
+                                        action={action}
+                                        selectedLoopID={selectedLoopID}
+                                        selectLoop={(actionID) => {
+                                            this.setState({ loopStart: null, selectedLoopID: actionID });
+                                        }}
+                                        selectPoint={(time: number) => {
+                                            this.audio().currentTime = time;
+                                        }}
+                                        setModal={(modal) => {
+                                            this.setState({ modal });
+                                        }}
+                                    />
+                                );
+                            })}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
     }
 
-    useEffect(() => {
-        localInitPlayer();
-        return mountListeners({
-            audioElem: audioRef.current,
-            setIsPlaying,
-            setCurrentTime
-        });
-    }, []);
-    useEffect(() => {
-        if (props.songModal) {
-            setModal({ type: 'update_song', song });
-        } else {
-            setModal(null);
+    audio(): HTMLAudioElement {
+        if (this.ref.main.audio.current == null) {
+            throw new Error('missing audio element!');
         }
-    }, [props.songModal]);
+        return this.ref.main.audio.current;
+    }
 
-    useEffect(() => {
-        if (loop != null && !loop.isInBounds(currentTime)) {
-            (audioRef.current as any).currentTime = loop.left;
+    updateScrollHeight = () => {
+        const fixedElem = this.ref.fixed.current;
+        const scrollElem = this.ref.scroll.current;
+        if (fixedElem == null || scrollElem == null) {
+            return;
         }
-    }, [currentTime, loop]);
 
-    async function localInitPlayer() {
+        const fixedRect = fixedElem.getBoundingClientRect();
+        const scrollOffset = fixedRect.top + fixedRect.height + 40;
+
+        if (this.state.scrollOffset != scrollOffset) {
+            this.setState({ scrollOffset });
+        }
+    };
+    localInitPlayer = async () => {
         try {
-            await initPlayer(song, audioRef, audioSourceRef, setLoadingText);
-            // await initPlayer2(song, audioRef, audioSourceRef);
-            if (audioRef.current == null) {
+            const audioElem = this.ref.main.audio.current;
+            if (audioElem == null) {
                 throw new Error('Нет элемента аудеоплеера');
             }
-            if (audioRef.current.duration === 0) {
+            // await initPlayer(song, audioRef, audioSourceRef, setLoadingText);
+            await initPlayer2(this.props.song, this.ref.main.audio, this.ref.main.source);
+            if (audioElem.duration === 0) {
                 throw new Error('Песня имеет нулеваю длину');
             }
-            setDuration(audioRef.current.duration);
+
+            audioElem.volume = this.state.mainVolume;
+
+            this.setState({ duration: audioElem.duration });
         } catch (e) {
-            setError(`Не удалось инициализировать аудиоплеер ${e}`);
+            this.props.setError(`Не удалось инициализировать аудиоплеер`);
             throw e;
         }
-    }
+    };
 
-    async function togglePlay() {
+    togglePlay = async () => {
         try {
-            if (isPlaying) {
-                audioRef.current?.pause();
+            if (this.state.isPlaying) {
+                this.audio().pause();
             } else {
-                await audioRef.current?.play();
+                await this.audio().play();
             }
         } catch (e) {
-            setError(`Не удалось переключить проигрывание`);
+            this.props.setError(`Не удалось переключить проигрывание`);
         }
-    }
+    };
 
-    const createLoop = async () => {
+    createLoop = async () => {
+        const { song } = this.props;
+        const { loopStart, createLoopLoading, currentTime } = this.state;
+
         if (loopStart == null || createLoopLoading) {
             return;
         }
 
-        setCreateLoopLoading(true);
-
         try {
-            setLoopStart(null);
+            this.setState({ createLoopLoading: true, loopStart: null });
 
             const loop = new Loop(loopStart, currentTime);
             const action = await apiCall('/frontend/create_action', {
@@ -161,226 +491,167 @@ export function SongExplorer(props: Props) {
                 loop: loop.toSegment()
             });
             song.actions = [action, ...song.actions];
-            setSelectedLoopID(action.id);
+            this.setState({ selectedLoopID: action.id });
         } finally {
-            setCreateLoopLoading(false);
+            this.setState({ createLoopLoading: false });
         }
     };
 
-    const createPoint = async () => {
+    createPoint = async () => {
+        const { song } = this.props;
+        const { createPointLoading } = this.state;
+
         if (createPointLoading) {
             return;
         }
 
-        setCreatePointLoading(true);
-
         try {
-            if (audioRef.current == null) {
-                throw new Error('audio ref can not be empty');
-            }
+            this.setState({ createPointLoading: true });
+
             const action = await apiCall('/frontend/create_action', {
                 song_id: song.id,
                 type: 'point',
-                point: audioRef.current.currentTime
+                point: this.audio().currentTime
             });
             song.actions = [action, ...song.actions];
         } finally {
-            setCreatePointLoading(false);
+            this.setState({ createPointLoading: false });
         }
     };
 
-    return (
-        <div className="song-explorer">
-            {duration === 0 ? <SegmentLoading text={loadingText} overlay={true} /> : null}
-            {modal != null ? (
-                <Modal
-                    {...modal}
-                    close={() => {
-                        setModal(null);
-                        if (modal?.type === 'update_song') {
-                            props.closeSongModal();
-                        }
-                    }}
-                    deleteAction={(songID) => {
-                        song.actions = [...song.actions].filter((action) => {
-                            return action.id != songID;
-                        });
-                        if (selectedLoopID == songID) {
-                            setSelectedLoopID(null);
-                        }
-                    }}
-                />
-            ) : null}
-            <div className="song-explorer-fixed">
-                <audio ref={audioRef} controls>
-                    <source ref={audioSourceRef} />
-                </audio>
-                {splitOptions.map((splitOption) => {
-                    return (
-                        <audio key={splitOption} ref={splitRefs[splitOption].audio} controls>
-                            <source ref={splitRefs[splitOption].source} />
-                        </audio>
-                    );
-                })}
+    getPoints = (): number[] => {
+        const res: number[] = [];
+        for (const action of this.props.song.actions) {
+            if (action.type === 'point' && action.point != null) {
+                res.push(action.point);
+            }
+        }
+        return res;
+    };
 
-                <AudioProgressBar
-                    duration={duration}
-                    currentTime={currentTime}
-                    points={[]}
-                    loop={loop}
-                    loopStart={loopStart}
-                    onSeek={(time) => {
-                        if (audioRef.current != null) {
-                            audioRef.current.currentTime = time;
-                        }
-                    }}
-                />
-                <div className="song-explorer-controls">
-                    {isPlaying ? (
-                        <Button
-                            className="song-explorer-player-controls-play pause"
-                            value={<FontAwesomeIcon icon={faPause} />}
-                            style="grey"
-                            onClick={() => {
-                                togglePlay();
-                            }}
-                        />
-                    ) : (
-                        <Button
-                            className="song-explorer-player-controls-play resume"
-                            value={<FontAwesomeIcon icon={faPlay} />}
-                            onClick={() => {
-                                togglePlay();
-                            }}
-                            style="grey"
-                        />
-                    )}
-                    {loop != null ? (
-                        <div className="song-explorer-player-controls-loop">
-                            <div className="loop-segment">
-                                <span className="loop-segment-val">{secondsToStr(loop.left)}</span>
-                                <span className="loop-segment-sep">-</span>
-                                <span className="loop-segment-val">{secondsToStr(loop.right)}</span>
-                            </div>
-                            <div
-                                className="stop-loop"
-                                onClick={() => {
-                                    setSelectedLoopID(null);
-                                }}
-                            >
-                                <FontAwesomeIcon icon={faTimes} />
-                            </div>
-                        </div>
-                    ) : null}
-                </div>
-                <div className="song-explorer-speed">
-                    {speedOptions.map((speed) => {
-                        const selected = speed === selectedSpeed;
-                        return (
-                            <div
-                                key={speed}
-                                className={classNames('song-explorer-speed-item component-button small', {
-                                    'style-grey': !selected,
-                                    'style-blue': selected
-                                })}
-                                onClick={() => {
-                                    if (speed != selectedSpeed) {
-                                        setSelectedSpeed(speed);
-                                    }
-                                    if (audioRef.current != null) {
-                                        audioRef.current.playbackRate = speed / 100;
-                                    }
-                                }}
-                            >
-                                {speed}%
-                            </div>
-                        );
-                    })}
-                </div>
-                <div className="song-explorer-actions">
-                    <Button
-                        className="song-explorer-actions-point"
-                        loading={createPointLoading}
-                        value={
-                            <span>
-                                <FontAwesomeIcon icon={faLocationDot} />
-                                Добавить точку
-                            </span>
-                        }
-                        onClick={() => {
-                            createPoint();
-                        }}
-                        style="green"
-                        small
-                    />
-                    {loopStart == null ? (
-                        <Button
-                            className="song-explorer-actions-loop"
-                            loading={createLoopLoading}
-                            value={
-                                <span>
-                                    <FontAwesomeIcon icon={faRecycle} />
-                                    Начать цикл
-                                </span>
-                            }
-                            onClick={() => {
-                                if (duration == null) {
-                                    return;
-                                }
-                                setSelectedLoopID(null);
-                                setLoopStart(audioRef.current?.currentTime ?? 0);
-                            }}
-                            style="yellow"
-                            small
-                        />
-                    ) : (
-                        <Button
-                            className="song-explorer-actions-loop"
-                            loading={createLoopLoading}
-                            value={
-                                <>
-                                    <span>
-                                        <FontAwesomeIcon icon={faStop} /> {secondsToStr(currentTime - loopStart)} Завершить
-                                    </span>
-                                    {/* <div className="song-explorer-actions-loop-time">01:05</div>*/}
-                                </>
-                            }
-                            onClick={() => {
-                                createLoop();
-                            }}
-                            style="yellow"
-                            small
-                        />
-                    )}
-                </div>
-            </div>
-            <div className="song-explorer-scroll">
-                <div className="song-explorer-actions-history">
-                    <div className="song-explorer-actions-history-title">Сохраненные действия</div>
-                    <div className="song-explorer-actions-history-container">
-                        {song.actions.map((action) => {
-                            return (
-                                <Action
-                                    key={action.id}
-                                    song={song}
-                                    action={action}
-                                    selectedLoopID={selectedLoopID}
-                                    selectLoop={(actionID) => {
-                                        setLoopStart(null);
-                                        setSelectedLoopID(actionID);
-                                    }}
-                                    selectPoint={(time: number) => {
-                                        if (audioRef.current != null) audioRef.current.currentTime = time;
-                                    }}
-                                    setModal={setModal}
-                                />
-                            );
-                        })}
-                    </div>
-                </div>
-            </div>
-        </div>
-    );
+    getSelectedLoop(): { action: SongAction; loop: Loop } | null {
+        const { song } = this.props;
+        const { selectedLoopID } = this.state;
+
+        if (selectedLoopID == null) {
+            return null;
+        }
+
+        let selectedLoop: SongAction | null = null;
+        for (const action of song.actions) {
+            if (action.id == selectedLoopID) {
+                selectedLoop = action;
+                break;
+            }
+        }
+        if (selectedLoop == null || selectedLoop.loop == null) {
+            return null;
+        }
+
+        const loop = Loop.fromSegment(selectedLoop.loop);
+
+        return { action: selectedLoop, loop };
+    }
+
+    mountListeners = (): (() => void) => {
+        const audioElem = this.ref.main.audio.current;
+        if (audioElem == null) {
+            throw new Error('audioElem is null');
+        }
+
+        let mounted = true;
+
+        // const timeupdate = () => {
+        //     this.setState({ currentTime: audioElem.currentTime });
+        // };
+
+        const ended = (e: Event) => {
+            this.setState({ isPlaying: false });
+        };
+
+        const pause = () => {
+            this.setState({ isPlaying: false });
+        };
+
+        const play = () => {
+            this.setState({ isPlaying: true });
+        };
+
+        const waiting = () => {
+            this.setState({ playerStalled: true });
+        };
+
+        const playing = () => {
+            this.setState({ playerStalled: false, isPlaying: true });
+        };
+
+        const volumechange = () => {
+            this.setState({ mainVolume: audioElem.volume });
+        };
+
+        let prevLoopID: number | null = null;
+        const raf = () => {
+            if (!mounted) {
+                return;
+            }
+
+            const selectedLoop = this.getSelectedLoop();
+            if (selectedLoop == null && prevLoopID != null) {
+                prevLoopID = null;
+            }
+            if (
+                selectedLoop != null &&
+                (!selectedLoop.loop.isInBounds(audioElem.currentTime) || prevLoopID !== selectedLoop.action.id)
+            ) {
+                prevLoopID = selectedLoop.action.id;
+                if (Math.abs(audioElem.currentTime - selectedLoop.loop.left) > 0.15) {
+                    audioElem.currentTime = selectedLoop.loop.left;
+                }
+            } else {
+                const currentTime = audioElem.currentTime;
+                if (Math.abs(this.state.currentTime - currentTime) > 0.15) {
+                    this.setState({ currentTime });
+                }
+            }
+
+            requestAnimationFrame(raf);
+        };
+        raf();
+
+        // audioElem.addEventListener('timeupdate', timeupdate);
+        audioElem.addEventListener('ended', ended);
+        audioElem.addEventListener('pause', pause);
+        audioElem.addEventListener('play', play);
+        audioElem.addEventListener('playing', playing);
+        audioElem.addEventListener('waiting', waiting);
+        audioElem.addEventListener('volumechange', volumechange);
+
+        // audioElem.addEventListener('loadeddata', (e) => {
+        //     console.log('loadeddata', e);
+        // });
+        // audioElem.addEventListener('loadedmetadata', (e) => {
+        //     console.log('loadedmetadata', e);
+        // });
+        // audioElem.addEventListener('loadstart', (e) => {
+        //     console.log('loadstart', e);
+        // });
+        // audioElem.addEventListener('stalled', (e) => {
+        //     console.log('stalled', e);
+        // });
+        // audioElem.addEventListener('suspend', (e) => {
+        //     console.log('suspend', e);
+        // });
+
+        return () => {
+            mounted = false;
+            audioElem.removeEventListener('ended', ended);
+            audioElem.removeEventListener('pause', pause);
+            audioElem.removeEventListener('play', play);
+            audioElem.removeEventListener('playing', playing);
+            audioElem.removeEventListener('waiting', waiting);
+            audioElem.removeEventListener('volumechange', volumechange);
+        };
+    };
 }
 
 interface ModalProps extends modal {
@@ -397,6 +668,14 @@ function Modal(props: ModalProps) {
     const [performer, setPerformer] = useState<string>(song.performer ?? '');
     const [deleteConfirmations, setDeleteConfirmations] = useState<number | null>(null);
     const showNotification = useNotificationStore((state) => state.show);
+
+    const focusInputRef = useRef<HTMLInputElement>(null);
+
+    useEffect(() => {
+        if (focusInputRef.current != null) {
+            focusInputRef.current.focus();
+        }
+    }, []);
     const renameAction = async () => {
         if (loading) {
             return;
@@ -505,6 +784,7 @@ function Modal(props: ModalProps) {
                 }}
             >
                 <Input
+                    inputRef={focusInputRef}
                     label="Название"
                     value={actionName}
                     onChange={(e) => {
@@ -573,6 +853,7 @@ function Modal(props: ModalProps) {
                 }}
             >
                 <Input
+                    inputRef={focusInputRef}
                     label="Название"
                     value={name}
                     onChange={(e) => {
