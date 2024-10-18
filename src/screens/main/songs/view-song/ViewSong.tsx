@@ -18,6 +18,7 @@ export function ViewSong() {
     const navigate = useNavigate();
     const [screenState, setScreenState] = useState<PayloadScreenState<SongDetailed>>({ status: 'loading' });
     const [songModal, setSongModal] = useState<boolean>(false);
+    const [reloadKey, setReloadKey] = useState<number>(0);
 
     async function getSong() {
         try {
@@ -53,7 +54,7 @@ export function ViewSong() {
 
         content = (
             <SongExplorer
-                key={song.id}
+                key={`${song.id}-${reloadKey}`}
                 song={song}
                 songModal={songModal}
                 closeSongModal={() => {
@@ -64,6 +65,10 @@ export function ViewSong() {
                         status: 'error',
                         error: err
                     });
+                }}
+                callReload={() => {
+                    console.log('Call reload!!!');
+                    setReloadKey(reloadKey + 1);
                 }}
             />
         );

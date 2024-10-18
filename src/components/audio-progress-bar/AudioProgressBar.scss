@@ -49,6 +49,11 @@
         width: 0;
         overflow: hidden;
         background-color: $blue;
+        transition: background-color 0.5s ease;
+
+        &.loading-item {
+            background-color: darken($blue, 7);
+        }
     }
     .audio-progress-bar-current-time {
         position: absolute;

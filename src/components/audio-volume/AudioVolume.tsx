@@ -6,7 +6,9 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import classNames from 'classnames';
 
 interface Props {
+    className?: string;
     volume: number;
+    savedVolume?: number;
     subTrack?: {
         index: number;
         name: string;
@@ -20,7 +22,7 @@ interface State {
     volumePointer: number | null;
 }
 
-const subTrackColors = ['#0071ff', '#01aba0', '#fee38a', '#FC7A57', '#6B5CA5'];
+const subTrackColors = ['#FA198B', '#01aba0', '#fee38a', '#FC7A57', '#D295BF'];
 
 export class AudioVolume extends React.Component<Props, State> {
     private unmountListeners = () => {
@@ -45,11 +47,18 @@ export class AudioVolume extends React.Component<Props, State> {
         this.unmountListeners();
     }
 
+    componentDidUpdate(prevProps: Readonly<Props>) {
+        const { savedVolume } = this.props;
+        if (savedVolume != null && savedVolume != prevProps.savedVolume) {
+            this.setState({ savedVolume });
+        }
+    }
+
     render = () => {
         const { volume, subTrack } = this.props;
         const { volumePointer } = this.state;
 
-        let color = subTrackColors[0];
+        let color = '#0071ff';
         if (subTrack != null) {
             color = subTrackColors[subTrack.index % subTrackColors.length];
         }
@@ -80,7 +89,7 @@ export class AudioVolume extends React.Component<Props, State> {
         }
 
         return (
-            <div className="audio-volume">
+            <div className={classNames('audio-volume', this.props.className)}>
                 <div className="audio-volume-subtrack">
                     {subTrack == null ? null : (
                         <>
@@ -155,6 +164,7 @@ export class AudioVolume extends React.Component<Props, State> {
                 const width = borderElem.offsetWidth;
                 const startX = type === 'mouse' ? (event as MouseEvent).pageX : (event as TouchEvent).touches[0].pageX;
                 const startXOffset = width * createRatio(this.props.volume, 1);
+                // eslint-disable-next-line no-unused-vars
                 let latestVolumePointer: number | null = null;
                 const move = (event: unknown) => {
                     const deltaX =
@@ -162,9 +172,10 @@ export class AudioVolume extends React.Component<Props, State> {
                     const endOffset = startXOffset + deltaX;
                     const volumePointer = createRatio(endOffset, width);
 
-                    if (volumePointer != latestVolumePointer) {
-                        this.setState({ volumePointer });
-                    }
+                    // if (volumePointer != latestVolumePointer) {
+                    //     this.setState({ volumePointer });
+                    // }
+                    this.props.onVolumeUpdate(volumePointer);
 
                     latestVolumePointer = volumePointer;
                 };
@@ -179,11 +190,11 @@ export class AudioVolume extends React.Component<Props, State> {
                         document.body.removeEventListener('touchcancel', up);
                     }
 
-                    this.setState({ volumePointer: null });
+                    // this.setState({ volumePointer: null });
 
-                    if (latestVolumePointer != null) {
-                        this.props.onVolumeUpdate(latestVolumePointer);
-                    }
+                    // if (latestVolumePointer != null) {
+                    //     this.props.onVolumeUpdate(latestVolumePointer);
+                    // }
                 };
 
                 if (type === 'mouse') {

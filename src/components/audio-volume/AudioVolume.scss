@@ -42,7 +42,7 @@
     font-size: 14px;
     cursor: pointer;
     border: 1px solid #6b707a;
-    background-color: darken(#6b707a, 15);
+    background-color: lighten(#323741, 2);
     border-radius: 10px;
     width: 100px;
     text-align: center;
@@ -78,17 +78,24 @@
 .audio-volume-subtrack-slider-current-text {
     position: absolute;
     left: 0;
-    bottom: 0;
+    top: 0;
+    line-height: 29px;
+    width: 50px;
+    text-align: left;
     color: $text-primary-color;
     font-size: 17px;
     text-shadow: rgba(0, 0, 0, 1) 0 0 2px;
-    transition: left 0.25s ease, transform 0.25s ease;
+    //transition: left 0.25s ease, transform 0.25s ease;
     white-space: nowrap;
     word-break: keep-all;
+    margin-left: 23px;
 
     .audio-volume-subtrack-slider-current-text-icon {
-        font-size: 14px;
-        margin-right: 3px;
+        position: absolute;
+        left: -23px;
+        top: 6.5px;
+        bottom: 0;
+        font-size: 16px;
     }
 }
 .audio-volume-subtrack-slider-pointer-fill {

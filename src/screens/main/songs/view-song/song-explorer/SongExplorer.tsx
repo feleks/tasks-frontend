@@ -32,6 +32,7 @@ interface Props {
     songModal: boolean;
 
     setError(err: string): void;
+    callReload(): void;
     closeSongModal(): void;
 }
 export interface modal {
@@ -88,6 +89,9 @@ interface Ref {
 type Unmounter = () => void;
 
 export class SongExplorer extends React.Component<Props, State> {
+    private timestamp = Date.now();
+    private counter = 0;
+
     private readonly ref: Ref;
     private unmounters: Unmounter[] = [];
     constructor(props: Props) {
@@ -140,6 +144,8 @@ export class SongExplorer extends React.Component<Props, State> {
         const id = setInterval(this.updateScrollHeight, 5000);
 
         this.unmounters.push(() => clearInterval(id));
+
+        (window as any).audioElem = this.ref.main.audio.current;
     }
 
     componentWillUnmount() {
@@ -149,7 +155,10 @@ export class SongExplorer extends React.Component<Props, State> {
     }
 
     render() {
-        // console.log('SongExplorerRender', Math.floor(new Date().valueOf() / 10) % 10000);
+        this.counter += 1;
+        const timeDelta = Date.now() - this.timestamp;
+
+        console.log(`SongExplorerRender, renders: ${this.counter} rps: ${timeDelta > 0 ? this.counter / (timeDelta / 1000) : 0}`);
 
         const { song, songModal, closeSongModal } = this.props;
         const {
@@ -290,25 +299,48 @@ export class SongExplorer extends React.Component<Props, State> {
                                 }}
                             />
                         ) : (
-                            ['Ударные', 'Бас', 'Клавишные', 'Вокал', 'Остальное'].map((name, i) => {
-                                return (
-                                    <AudioVolume
-                                        key={name}
-                                        subTrack={{
-                                            index: i,
-                                            name: name
-                                        }}
-                                        volume={this.state.test_SubTracksVolumes[i]}
-                                        onVolumeUpdate={(volume) => {
-                                            const newVolumes = [...this.state.test_SubTracksVolumes];
-                                            newVolumes[i] = volume;
+                            <div className="song-explorer-volume-subtracks">
+                                <AudioVolume
+                                    className="song-explorer-volume-subtracks-mastervolume"
+                                    volume={this.state.mainVolume}
+                                    onVolumeUpdate={(volume) => {
+                                        const newVolumes = [...this.state.test_SubTracksVolumes];
+                                        const emptyCount = newVolumes.reduce((acc, elem) => {
+                                            if (elem === 0) {
+                                                return acc + 1;
+                                            } else {
+                                                return acc;
+                                            }
+                                        }, 0);
+                                        for (let i = 0; i < newVolumes.length; i++) {
+                                            if (newVolumes[i] > 0 || emptyCount === newVolumes.length) {
+                                                newVolumes[i] = volume;
+                                            }
+                                        }
+                                        this.setState({ test_SubTracksVolumes: newVolumes, mainVolume: volume });
+                                        this.audio().volume = volume;
+                                    }}
+                                />
+                                {['Ударные', 'Бас', 'Клавишные', 'Вокал', 'Остальное'].map((name, i) => {
+                                    return (
+                                        <AudioVolume
+                                            key={name}
+                                            subTrack={{
+                                                index: i,
+                                                name: name
+                                            }}
+                                            volume={this.state.test_SubTracksVolumes[i]}
+                                            savedVolume={this.state.mainVolume}
+                                            onVolumeUpdate={(volume) => {
+                                                const newVolumes = [...this.state.test_SubTracksVolumes];
+                                                newVolumes[i] = volume;
 
-                                            this.setState({ test_SubTracksVolumes: newVolumes });
-                                            this.audio().volume = volume;
-                                        }}
-                                    />
-                                );
-                            })
+                                                this.setState({ test_SubTracksVolumes: newVolumes });
+                                            }}
+                                        />
+                                    );
+                                })}
+                            </div>
                         )}
                     </div>
                     <div className="song-explorer-speed">
@@ -469,7 +501,9 @@ export class SongExplorer extends React.Component<Props, State> {
                 await this.audio().play();
             }
         } catch (e) {
-            this.props.setError(`Не удалось переключить проигрывание`);
+            useNotificationStore.getState().show('error', 'Не удалось перекючить проигрывание');
+            this.props.callReload();
+            // this.props.setError(`Не удалось переключить проигрывание`);
         }
     };
 
@@ -560,10 +594,11 @@ export class SongExplorer extends React.Component<Props, State> {
         }
 
         let mounted = true;
+        let stalledTimeoutID: number | null = null;
 
-        // const timeupdate = () => {
-        //     this.setState({ currentTime: audioElem.currentTime });
-        // };
+        const timeupdate = () => {
+            processCurrentTimeUpdate(0);
+        };
 
         const ended = (e: Event) => {
             this.setState({ isPlaying: false });
@@ -578,10 +613,24 @@ export class SongExplorer extends React.Component<Props, State> {
         };
 
         const waiting = () => {
+            if (stalledTimeoutID != null) {
+                clearTimeout(stalledTimeoutID);
+            }
+
+            stalledTimeoutID = setTimeout(() => {
+                useNotificationStore.getState().show('error', 'Не удалось загрузить часть файла');
+                stalledTimeoutID = null;
+                this.props.callReload();
+            }, 7500) as any;
+
             this.setState({ playerStalled: true });
         };
 
         const playing = () => {
+            if (stalledTimeoutID != null) {
+                clearTimeout(stalledTimeoutID);
+                stalledTimeoutID = null;
+            }
             this.setState({ playerStalled: false, isPlaying: true });
         };
 
@@ -590,35 +639,46 @@ export class SongExplorer extends React.Component<Props, State> {
         };
 
         let prevLoopID: number | null = null;
-        const raf = () => {
-            if (!mounted) {
-                return;
-            }
+        const processCurrentTimeUpdate = (updateDelta: number) => {
+            const currentTime = audioElem.currentTime;
 
             const selectedLoop = this.getSelectedLoop();
             if (selectedLoop == null && prevLoopID != null) {
                 prevLoopID = null;
             }
-            if (
-                selectedLoop != null &&
-                (!selectedLoop.loop.isInBounds(audioElem.currentTime) || prevLoopID !== selectedLoop.action.id)
-            ) {
-                prevLoopID = selectedLoop.action.id;
-                if (Math.abs(audioElem.currentTime - selectedLoop.loop.left) > 0.15) {
-                    audioElem.currentTime = selectedLoop.loop.left;
+
+            let shouldMoveToLoopStart = false;
+            if (selectedLoop != null) {
+                const isOutOfBounds = !selectedLoop.loop.isInBounds(currentTime);
+                const isNewSelectedLoop = prevLoopID !== selectedLoop.action.id;
+                const isOutOfDelta = currentTime - selectedLoop.loop.left > 0.1;
+
+                if (isNewSelectedLoop) {
+                    prevLoopID = selectedLoop.action.id;
                 }
-            } else {
-                const currentTime = audioElem.currentTime;
-                if (Math.abs(this.state.currentTime - currentTime) > 0.15) {
-                    this.setState({ currentTime });
-                }
+
+                shouldMoveToLoopStart = isOutOfBounds || (isNewSelectedLoop && isOutOfDelta);
             }
+
+            if (shouldMoveToLoopStart && selectedLoop != null) {
+                audioElem.currentTime = selectedLoop.loop.left;
+                this.setState({ currentTime: selectedLoop.loop.left });
+            } else if (updateDelta === 0 || Math.abs(this.state.currentTime - currentTime) > updateDelta) {
+                this.setState({ currentTime });
+            }
+        };
+        const raf = () => {
+            if (!mounted) {
+                return;
+            }
+
+            processCurrentTimeUpdate(2);
 
             requestAnimationFrame(raf);
         };
         raf();
 
-        // audioElem.addEventListener('timeupdate', timeupdate);
+        audioElem.addEventListener('timeupdate', timeupdate);
         audioElem.addEventListener('ended', ended);
         audioElem.addEventListener('pause', pause);
         audioElem.addEventListener('play', play);
@@ -641,9 +701,13 @@ export class SongExplorer extends React.Component<Props, State> {
         // audioElem.addEventListener('suspend', (e) => {
         //     console.log('suspend', e);
         // });
+        // audioElem.addEventListener('emptied', (e) => {
+        //     console.log('emptied', e);
+        // });
 
         return () => {
             mounted = false;
+            audioElem.removeEventListener('timeupdate', timeupdate);
             audioElem.removeEventListener('ended', ended);
             audioElem.removeEventListener('pause', pause);
             audioElem.removeEventListener('play', play);

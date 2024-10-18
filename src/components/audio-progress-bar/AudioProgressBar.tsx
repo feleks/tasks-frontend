@@ -1,6 +1,7 @@
 import { createRatio, Loop, secondsToStr } from '../../screens/main/songs/view-song/song-explorer/utils';
 import React, { createRef } from 'react';
 import './AudioProgressBar.scss';
+import classNames from 'classnames';
 
 interface Props {
     duration: number;
@@ -44,7 +45,7 @@ export class AudioProgressBar extends React.Component<Props, State> {
     }
 
     render = () => {
-        const { duration, currentTime, points, loopStart } = this.props;
+        const { duration, currentTime, points, loopStart, stalled } = this.props;
         const { pointerRatio, latestPointerRation } = this.state;
 
         let loop = this.props.loop;
@@ -79,7 +80,10 @@ export class AudioProgressBar extends React.Component<Props, State> {
 
                 <div className="audio-progress-bar-container">
                     <div className="audio-progress-bar-border" ref={this.borderRef}></div>
-                    <div className="audio-progress-bar-current-fill" style={{ width: currentFillPercentStr }}></div>
+                    <div
+                        className={classNames('audio-progress-bar-current-fill', { 'loading-item': stalled })}
+                        style={{ width: currentFillPercentStr }}
+                    ></div>
 
                     {points.map((point, i) => {
                         const ratio = createRatio(point, duration);
